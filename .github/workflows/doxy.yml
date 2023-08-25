@@ -27,9 +27,6 @@ jobs:
           git switch gh-pages
           rm -rf docs
           rm -rf html
-          ls -la ./
-          ls -la ../
-          pwd
           cp -rf ./docs_build/docs/html/ ./
           rm -rf ./docs_build
           date > build_date
