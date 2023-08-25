@@ -123,6 +123,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a4a37feabd8beeda187acef9a744296c0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#a4a37feabd8beeda187acef9a744296c0">fqname_json_to_csv</a> ()</td></tr>
 <tr class="memdesc:a4a37feabd8beeda187acef9a744296c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns fqname in the CSV format.  <a href="basic__rest__functions_8sh.html#a4a37feabd8beeda187acef9a744296c0">More...</a><br /></td></tr>
 <tr class="separator:a4a37feabd8beeda187acef9a744296c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9019121b0c620264db3a45ca6fa9708"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> ()</td></tr>
+<tr class="memdesc:ae9019121b0c620264db3a45ca6fa9708"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the UUID of an object with a given fqname.  <a href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">More...</a><br /></td></tr>
+<tr class="separator:ae9019121b0c620264db3a45ca6fa9708"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -132,9 +135,6 @@ Variables</h2></td></tr>
 <tr class="memitem:a5b41285ba8b2ca9452eb7e7e4e08af5c"><td class="memItemLeft" align="right" valign="top">String Array&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#a5b41285ba8b2ca9452eb7e7e4e08af5c">LAT_LETTERS</a></td></tr>
 <tr class="memdesc:a5b41285ba8b2ca9452eb7e7e4e08af5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ordered list of capital latin letters.  <a href="basic__rest__functions_8sh.html#a5b41285ba8b2ca9452eb7e7e4e08af5c">More...</a><br /></td></tr>
 <tr class="separator:a5b41285ba8b2ca9452eb7e7e4e08af5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8953505cdfb70bf649962db5dd2316ca"><td class="memItemLeft" align="right" valign="top">Exported String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#a8953505cdfb70bf649962db5dd2316ca">BASIC_REST_FUNCTIONS</a> =</td></tr>
-<tr class="memdesc:a8953505cdfb70bf649962db5dd2316ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">A guard variable to prevent recursive execution of <a class="el" href="basic__rest__functions_8sh.html" title="A set of functions to talk to the TF Agent REST server.">basic_rest_functions.sh</a>.  <a href="basic__rest__functions_8sh.html#a8953505cdfb70bf649962db5dd2316ca">More...</a><br /></td></tr>
-<tr class="separator:a8953505cdfb70bf649962db5dd2316ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >A set of functions to talk to the TF Agent REST server. </p>
@@ -271,6 +271,28 @@ Variables</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00160">160</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  160</span>{</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ae9019121b0c620264db3a45ca6fa9708" name="ae9019121b0c620264db3a45ca6fa9708"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9019121b0c620264db3a45ca6fa9708">&#9670;&#160;</a></span>fqname_to_uuid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">fqname_to_uuid </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns the UUID of an object with a given fqname. </p>
+
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00173">173</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  173</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -429,24 +451,6 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="a8953505cdfb70bf649962db5dd2316ca" name="a8953505cdfb70bf649962db5dd2316ca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8953505cdfb70bf649962db5dd2316ca">&#9670;&#160;</a></span>BASIC_REST_FUNCTIONS</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Exported String BASIC_REST_FUNCTIONS =</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>A guard variable to prevent recursive execution of <a class="el" href="basic__rest__functions_8sh.html" title="A set of functions to talk to the TF Agent REST server.">basic_rest_functions.sh</a>. </p>
-
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l01391">1391</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-
-</div>
-</div>
 <a id="a9ede953a9867c5217d9b5cc98d902cfc" name="a9ede953a9867c5217d9b5cc98d902cfc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9ede953a9867c5217d9b5cc98d902cfc">&#9670;&#160;</a></span>HEX_DIGITS</h2>
 
