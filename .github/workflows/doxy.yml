@@ -30,7 +30,7 @@ jobs:
           ls -la ./
           ls -la ../
           pwd
-          cp -rf ../docs_build/docs/html/ ./
+          cp -rf ./docs_build/docs/html/ ./
           date > build_date
           git status
           git add -A
