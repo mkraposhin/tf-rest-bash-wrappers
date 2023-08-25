@@ -1,0 +1,35 @@
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  make_doxygen:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Hello World!"
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          path: ./
+      - run: mkdir                   docs_build
+      - run: cp -rf *.sh             docs_build/
+      - run: cp -rf Doxyfile         docs_build/
+      - run: cp -rf doxygen-bash.sed docs_build/
+      - uses: mattnotmitt/doxygen-action@1.9.5
+        with:
+         working-directory: docs_build
+         doxyfile-path: 'Doxyfile'
+      - shell: bash
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git switch gh-pages
+          rm -rf docs
+          rm -rf html
+          cp -rf ../docs_build/docs/html/ ./
+          date > build_date
+          git status
+          git add -A
+          git commit -m "gh-pages auto update"
+          git push -u origin
