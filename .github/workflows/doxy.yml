@@ -22,7 +22,6 @@ jobs:
          doxyfile-path: 'Doxyfile'
       - shell: bash
         run: |
-          rm -rf ./docs_build
           git config user.name github-actions
           git config user.email github-actions@github.com
           git switch gh-pages
