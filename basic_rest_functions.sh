@@ -304,7 +304,8 @@ function make_random_ipam_subnets_ipv4(){
     echo $subnets_str
 }
 
-
+## @fn add_reference()
+## @brief Creates a reference between two objects
 function add_reference() {
     local from_uuid="$1"
     local from_type="$2"
@@ -327,6 +328,8 @@ REQ_MARKER
     execute_post_request "$REQ_STR" "$REQ_URL"
 }
 
+## @fn del_reference()
+## @brief Removes the reference between two objects
 function del_reference() {
     local from_uuid="$1"
     local from_type="$2"
@@ -349,9 +352,10 @@ REQ_MARKER
     execute_post_request "$REQ_STR" "$REQ_URL"
 }
 
-#
-#Deletes an entity
-#INPUT: an uuid of an entity and type of an entity
+
+## @fn delete_entity()
+## @brief Deletes an entity (object)
+## INPUT: an uuid of an entity and type of an entity
 function delete_entity(){
     local entity_uuid="$1"
     local type="$2"
@@ -360,8 +364,6 @@ function delete_entity(){
 
     execute_delete_request $REQ_STR
 }
-
-
 
 #
 # Creates a new network
