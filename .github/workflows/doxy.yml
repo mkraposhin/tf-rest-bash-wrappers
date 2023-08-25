@@ -28,7 +28,6 @@ jobs:
           rm -rf docs
           rm -rf html
           cp -rf ./docs_build/docs/html/ ./
-          rm -rf ./docs_build
           date > build_date
           git status
           git add -A
