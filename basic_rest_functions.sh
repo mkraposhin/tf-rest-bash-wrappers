@@ -168,9 +168,8 @@ function fqname_json_to_csv() {
     echo "$csv_fqname"
 }
 
-#
-# Returns the uuid of an object with a given fqname
-#
+## @fn fqname_to_uuid()
+## @brief Returns the UUID of an object with a given fqname
 function fqname_to_uuid(){
     local fqname="$1"
     local type="$2"
@@ -189,6 +188,8 @@ REQ_MARKER
     echo $UUID_STR
 }
 
+## @fn make_ipam_subnet_str
+## @brief Creates a JSON representation for subnet object
 function make_ipam_subnet_str(){
     local prefix=$1
     local prefix_len=$2
@@ -198,6 +199,111 @@ function make_ipam_subnet_str(){
     iss=$iss" \"addr_from_start\": true}"
     echo $iss
 }
+
+## @fn make_random_ipam_subnet_prefix_ipv4()
+## @brief Creates random IPv4 subnet prefix of a given length
+function make_random_ipam_subnet_prefix_ipv4(){
+    local subnet_prefix=
+    subnet_prefix=$subnet_prefix"`random_dec_digit_max 3`"
+    subnet_prefix=$subnet_prefix"`random_dec_digit_max 6`"
+    subnet_prefix=$subnet_prefix"`random_dec_digit_max 6`"
+
+    subnet_prefix="$1""$subnet_prefix"
+    echo $subnet_prefix
+}
+
+## @fn make_random_ipam_subnet_prefix_ipv6()
+## @brief Creates random IPv6 subnet prefix of a given length
+function make_random_ipam_subnet_prefix_ipv6(){
+    subnet_prefix=$subnet_prefix"`random_hex_digit`"
+    subnet_prefix=$subnet_prefix"`random_hex_digit`"
+    subnet_prefix=$subnet_prefix"`random_hex_digit`"
+    subnet_prefix=$subnet_prefix"::"
+    echo $subnet_prefix
+}
+
+## @fn make_random_ipam_subnet_ipv6()
+## @brief Creates JSON description of IPv6 subnet of length 16
+function make_random_ipam_subnet_ipv6(){
+    local ipam_subnet_prefix=`make_random_ipam_subnet_prefix_ipv6`
+    local prefix_len=16
+    local ipam_subnet_str=`make_ipam_subnet_str $ipam_subnet_prefix $prefix_len`
+    echo $ipam_subnet_str
+}
+
+## @fn make_random_ipam_subnet_ipv4()
+## @brief Creates random ipam subnet prefix. Input: prepending part (e.g. 10., 10.1., etc) 
+function make_random_ipam_subnet_ipv4(){
+    local prefix_prep=$1
+    local prefix=`make_random_ipam_subnet_prefix_ipv4 $prefix_prep`
+    local ipam_subnet_str=
+    local n_dots=`echo $prefix_prep | grep -o "\." | wc -l` #search for dots
+    if [ "$prefix_prep" = "" ] && [ $n_dots -eq 0 ]
+    then
+        prefix="$prefix"".0.0.0"
+        ipam_subnet_str=`make_ipam_subnet_str $prefix 8`
+    elif [ $n_dots -eq 1 ]
+    then
+        prefix="$prefix"".0.0"
+        ipam_subnet_str=`make_ipam_subnet_str $prefix 16`
+    elif [ $n_dots -eq 2 ]
+    then
+        prefix="$prefix"".0"
+        ipam_subnet_str=`make_ipam_subnet_str $prefix 24`
+    else
+        ipam_subnet_str=""
+    fi
+    echo $ipam_subnet_str    
+}
+
+function make_ipam_subnet(){
+    local ipam_subnet_prefix=$1
+    local prefix_len=16
+    local ipam_subnet_str=`make_ipam_subnet_str $ipam_subnet_prefix $prefix_len`
+    echo $ipam_subnet_str
+}
+
+## @fn make_random_ipam_subnets_ipv6()
+## @brief Creates several ipv6 subnets
+function make_random_ipam_subnets_ipv6(){
+    local n_subnets=$1
+    local i=0
+    local subnets_str=""
+    while [ $i -lt $n_subnets ]
+    do
+        if [ $i -gt 0 ]
+        then
+            subnets_str=$subnets_str", "`make_random_ipam_subnet_ipv6`
+        else
+            subnets_str=`make_random_ipam_subnet_ipv6`
+        fi
+        i=`expr $i + 1`
+    done
+    echo $subnets_str
+}
+
+# Creates several ipv4 subnets
+# With a given constant prepended network part
+# Input: number of subnets, prepended part
+function make_random_ipam_subnets_ipv4(){
+    local n_subnets=$1
+    local prepend_part=$2
+    local i=0
+    local subnets_str=""
+    while [ $i -lt $n_subnets ]
+    do
+        if [ $i -gt 0 ]
+        then
+            subnets_str=$subnets_str", "`make_random_ipam_subnet_ipv4\
+                $prepend_part`
+        else
+            subnets_str=`make_random_ipam_subnet_ipv4 $prepend_part`
+        fi
+        i=`expr $i + 1`
+    done
+    echo $subnets_str
+}
+
 
 function add_reference() {
     local from_uuid="$1"
@@ -255,103 +361,7 @@ function delete_entity(){
     execute_delete_request $REQ_STR
 }
 
-function make_random_ipam_subnet_prefix_ipv4(){
-    local subnet_prefix=
-    subnet_prefix=$subnet_prefix"`random_dec_digit_max 3`"
-    subnet_prefix=$subnet_prefix"`random_dec_digit_max 6`"
-    subnet_prefix=$subnet_prefix"`random_dec_digit_max 6`"
 
-    subnet_prefix="$1""$subnet_prefix"
-    echo $subnet_prefix
-}
-
-function make_random_ipam_subnet_prefix_ipv6(){
-    subnet_prefix=$subnet_prefix"`random_hex_digit`"
-    subnet_prefix=$subnet_prefix"`random_hex_digit`"
-    subnet_prefix=$subnet_prefix"`random_hex_digit`"
-    subnet_prefix=$subnet_prefix"::"
-    echo $subnet_prefix
-}
-
-function make_random_ipam_subnet_ipv6(){
-    local ipam_subnet_prefix=`make_random_ipam_subnet_prefix_ipv6`
-    local prefix_len=16
-    local ipam_subnet_str=`make_ipam_subnet_str $ipam_subnet_prefix $prefix_len`
-    echo $ipam_subnet_str
-}
-
-#
-# Creates random ipam subnet prefix
-# Input: prepending part (e.g. 10., 10.1., etc) 
-function make_random_ipam_subnet_ipv4(){
-    local prefix_prep=$1
-    local prefix=`make_random_ipam_subnet_prefix_ipv4 $prefix_prep`
-    local ipam_subnet_str=
-    local n_dots=`echo $prefix_prep | grep -o "\." | wc -l` #search for dots
-    if [ "$prefix_prep" = "" ] && [ $n_dots -eq 0 ]
-    then
-        prefix="$prefix"".0.0.0"
-        ipam_subnet_str=`make_ipam_subnet_str $prefix 8`
-    elif [ $n_dots -eq 1 ]
-    then
-        prefix="$prefix"".0.0"
-        ipam_subnet_str=`make_ipam_subnet_str $prefix 16`
-    elif [ $n_dots -eq 2 ]
-    then
-        prefix="$prefix"".0"
-        ipam_subnet_str=`make_ipam_subnet_str $prefix 24`
-    else
-        ipam_subnet_str=""
-    fi
-    echo $ipam_subnet_str    
-}
-
-function make_ipam_subnet(){
-    local ipam_subnet_prefix=$1
-    local prefix_len=16
-    local ipam_subnet_str=`make_ipam_subnet_str $ipam_subnet_prefix $prefix_len`
-    echo $ipam_subnet_str
-}
-
-# Creates several ipv6 subnets
-function make_random_ipam_subnets_ipv6(){
-    local n_subnets=$1
-    local i=0
-    local subnets_str=""
-    while [ $i -lt $n_subnets ]
-    do
-        if [ $i -gt 0 ]
-        then
-            subnets_str=$subnets_str", "`make_random_ipam_subnet_ipv6`
-        else
-            subnets_str=`make_random_ipam_subnet_ipv6`
-        fi
-        i=`expr $i + 1`
-    done
-    echo $subnets_str
-}
-
-# Creates several ipv4 subnets
-# With a given constant prepended network part
-# Input: number of subnets, prepended part
-function make_random_ipam_subnets_ipv4(){
-    local n_subnets=$1
-    local prepend_part=$2
-    local i=0
-    local subnets_str=""
-    while [ $i -lt $n_subnets ]
-    do
-        if [ $i -gt 0 ]
-        then
-            subnets_str=$subnets_str", "`make_random_ipam_subnet_ipv4\
-                $prepend_part`
-        else
-            subnets_str=`make_random_ipam_subnet_ipv4 $prepend_part`
-        fi
-        i=`expr $i + 1`
-    done
-    echo $subnets_str
-}
 
 #
 # Creates a new network
