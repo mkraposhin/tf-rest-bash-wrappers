@@ -22,6 +22,7 @@ jobs:
          doxyfile-path: 'Doxyfile'
       - shell: bash
         run: |
+          rm -rf ./docs_build
           git config user.name github-actions
           git config user.email github-actions@github.com
           git switch gh-pages
@@ -31,6 +32,7 @@ jobs:
           ls -la ../
           pwd
           cp -rf ./docs_build/docs/html/ ./
+          rm -rf ./docs_build
           date > build_date
           git status
           git add -A
