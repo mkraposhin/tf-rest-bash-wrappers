@@ -304,6 +304,38 @@ function make_random_ipam_subnets_ipv4(){
     echo $subnets_str
 }
 
+## @fn make_ip_instance_name()
+## @brief Makes a name for an ip intance
+## INPUT: the prefix (string) and optionally, length of the random part
+## in a new name
+function make_ip_instance_name(){
+    local prefix="$1"
+    local random_len="$2"
+    local stop="no"
+    local ipi_name=""
+    local fq_name="\"[$ipi_name]\""
+    local obj_uuid=""
+    local i=0;
+
+    while [ "$stop" != "yes" ]
+    do
+        if [ "$random_len" != "" ]
+        then
+            ipi_name="$prefix""_"`random_string $random_len`
+        else
+            ipi_name="$prefix""_$i"
+        fi
+        fq_name="[\"$ipi_name\"]"
+        obj_uuid=`fqname_to_uuid "$fq_name" "instance-ip"`
+        if [ -n $obj_uuid ]
+        then
+            stop="yes"
+        fi
+        i=`expr $i + 1`
+    done
+    echo $ipi_name
+}
+
 ## @fn add_reference()
 ## @brief Creates a reference between two objects
 function add_reference() {
@@ -365,10 +397,87 @@ function delete_entity(){
     execute_delete_request $REQ_STR
 }
 
-#
-# Creates a new network
-# INPUT: name of network, number of subnets per
-# network, version of the IP protocol
+## @fn network_ipam_subnets()
+## @brief Extracts UUIDS of IPAM subnets of a given virtual network
+## INPUT: fqname of a virtual network
+function network_ipam_subnets(){
+    local nw_name=$1
+    local nw_fqname=`name_to_fqname $nw_name`
+    local nw_uuid=`fqname_to_uuid "$nw_fqname" virtual-network`
+    local REQ_URL="$REST_ADDRESS/virtual-network/$nw_uuid"
+
+    if [ "$nw_uuid" = "" ]
+    then
+        echo "Network $nw_fqname not found"
+    fi
+
+    local CURL_RES=`execute_get_request $REQ_URL`
+    
+    local VNW_DICT=`jq -c -r '.["virtual-network"]' <<< "$CURL_RES"`
+    local IPAM_REFS_DICT=`jq -c -r '.["network_ipam_refs"]' <<< "$VNW_DICT"`
+    local IPAMS_DICT=`jq -c -r '.[0].attr.ipam_subnets' <<< "$IPAM_REFS_DICT"`
+    local N_SUBNETS=`jq -c -r '. | length' <<< "$IPAMS_DICT"`
+
+    local i_subnet=0
+    local IPAM_UUIDS=""
+    while [ $i_subnet -lt $N_SUBNETS ]
+    do
+        subnet=`jq -c -r ".[$i_subnet].subnet.ip_prefix" <<< "$IPAMS_DICT"`
+        subnet_uuid=`jq -c -r ".[$i_subnet].subnet_uuid" <<< "$IPAMS_DICT"`
+        IPAM_UUIDS=$IPAM_UUIDS" $subnet_uuid"
+        i_subnet=`expr $i_subnet + 1`
+    done
+    
+    echo $IPAM_UUIDS
+}
+
+## @fn network_set_ipams()
+## @brief Sets an IPAM for the network
+function network_set_ipams() {
+    local nw_name="$1"
+    local new_ipam_prefixes="$2"
+    
+    local nw_fqname=`name_to_fqname "$nw_name"`
+    local nw_uuid=`fqname_to_uuid "$nw_fqname" virtual-network`
+    if [ "$nw_uuid" = "" ]
+    then
+        echo "Cant find $nw_fqname"
+        return 1
+    fi
+
+    for subnet in $new_ipam_prefixes
+    do
+        local subnet_prefix_len=${subnet#*"/"}
+        local slash_pos=$(( ${#subnet} - ${#subnet_prefix_len} - 1 ))
+        local subnet_prefix="${subnet:0:$slash_pos}"
+        ipam_subnets="$ipam_subnets "`make_ipam_subnet_str $subnet_prefix $subnet_prefix_len`","
+    done
+    ipam_subnets=${ipam_subnets::-1} #remove last ","
+
+    read -r -d '' REQ_STR <<- REQ_MARKER
+    {
+        "virtual-network":
+        {
+            "network_ipam_refs":
+            [{
+                "to": ["default-domain", "default-project", "default-network-ipam"],
+                "attr" : {"ipam_subnets":[$ipam_subnets]}
+            }]
+        }
+    }
+REQ_MARKER
+
+    local REQ_URL="$REST_ADDRESS/virtual-network/$nw_uuid"
+
+    REQ_STR=`echo $REQ_STR`
+    echo "$REQ_STR"
+    execute_put_request "$REQ_STR" "$REQ_URL"
+}
+
+## @fn create_network()
+## @brief Creates a new network
+## INPUT: name of network, number of subnets per
+## network, version of the IP protocol
 function create_network(){
     local nw_name=$1
     local n_ipam_subnets=$2
@@ -422,88 +531,9 @@ REQ_MARKER
     execute_post_request "$REQ_STR" "$REQ_URL"
 }
 
-#
-# Extracts UUIDS of IPAM subnets of a given virtual network
-# INPUT: fqname of a virtual network
-function network_ipam_subnets(){
-    local nw_name=$1
-    local nw_fqname=`name_to_fqname $nw_name`
-    local nw_uuid=`fqname_to_uuid "$nw_fqname" virtual-network`
-    local REQ_URL="$REST_ADDRESS/virtual-network/$nw_uuid"
-
-    if [ "$nw_uuid" = "" ]
-    then
-        echo "Network $nw_fqname not found"
-    fi
-
-    local CURL_RES=`execute_get_request $REQ_URL`
-    
-    local VNW_DICT=`jq -c -r '.["virtual-network"]' <<< "$CURL_RES"`
-    local IPAM_REFS_DICT=`jq -c -r '.["network_ipam_refs"]' <<< "$VNW_DICT"`
-    local IPAMS_DICT=`jq -c -r '.[0].attr.ipam_subnets' <<< "$IPAM_REFS_DICT"`
-    local N_SUBNETS=`jq -c -r '. | length' <<< "$IPAMS_DICT"`
-
-    local i_subnet=0
-    local IPAM_UUIDS=""
-    while [ $i_subnet -lt $N_SUBNETS ]
-    do
-        subnet=`jq -c -r ".[$i_subnet].subnet.ip_prefix" <<< "$IPAMS_DICT"`
-        subnet_uuid=`jq -c -r ".[$i_subnet].subnet_uuid" <<< "$IPAMS_DICT"`
-        IPAM_UUIDS=$IPAM_UUIDS" $subnet_uuid"
-        i_subnet=`expr $i_subnet + 1`
-    done
-    
-    echo $IPAM_UUIDS
-}
-
-#
-# Sets IPAM's for the network
-#
-function network_set_ipams() {
-    local nw_name="$1"
-    local new_ipam_prefixes="$2"
-    
-    local nw_fqname=`name_to_fqname "$nw_name"`
-    local nw_uuid=`fqname_to_uuid "$nw_fqname" virtual-network`
-    if [ "$nw_uuid" = "" ]
-    then
-        echo "Cant find $nw_fqname"
-        return 1
-    fi
-
-    for subnet in $new_ipam_prefixes
-    do
-        local subnet_prefix_len=${subnet#*"/"}
-        local slash_pos=$(( ${#subnet} - ${#subnet_prefix_len} - 1 ))
-        local subnet_prefix="${subnet:0:$slash_pos}"
-        ipam_subnets="$ipam_subnets "`make_ipam_subnet_str $subnet_prefix $subnet_prefix_len`","
-    done
-    ipam_subnets=${ipam_subnets::-1} #remove last ","
-
-    read -r -d '' REQ_STR <<- REQ_MARKER
-    {
-        "virtual-network":
-        {
-            "network_ipam_refs":
-            [{
-                "to": ["default-domain", "default-project", "default-network-ipam"],
-                "attr" : {"ipam_subnets":[$ipam_subnets]}
-            }]
-        }
-    }
-REQ_MARKER
-
-    local REQ_URL="$REST_ADDRESS/virtual-network/$nw_uuid"
-
-    REQ_STR=`echo $REQ_STR`
-    echo "$REQ_STR"
-    execute_put_request "$REQ_STR" "$REQ_URL"
-}
-
-#
-# Creates an IP Instance
-# Input: name, virtual-network fqname, subnet_uuid, ip address(optionally)
-#
+## @fn create_instance_ip()
+## @brief Creates an IP Instance
+## Input: name, virtual-network fqname, subnet_uuid, ip address(optionally)
 function create_instance_ip(){
     local REQ_STR
     local ipi_name="$1"
@@ -542,6 +572,9 @@ REQ_MARKER
     execute_post_request "$REQ_STR" "$REQ_URL"
 }
 
+## @fn create_instance_ip_ifnp()
+## @brief Creates a new instance ip if an object with the given name
+## is not found
 function create_instance_ip_ifnp() {
     local ipi_name="$1"
     local nw_name="$2"
@@ -556,10 +589,9 @@ function create_instance_ip_ifnp() {
     fi
 }
 
-#
-# @brief Creates a floating ip object
-# @input: fip name, parent ipi name, fip ip address, fip direction
-#
+## @fn create_floating_ip()
+## @brief Creates a floating ip object
+## @input: fip name, parent ipi name, fip ip address, fip direction
 function create_floating_ip(){
     local REQ_STR
     local fip_name=$1
@@ -598,9 +630,9 @@ REQ_MARKER
     execute_post_request "$REQ_STR" "$REQ_URL"
 }
 
-#
-#
-#
+
+## @fn create_intf_route_table()
+## @brief Creates new interface routes table
 function create_intf_route_table() {
     local REQ_STR
     local irt_name=$1
@@ -633,42 +665,9 @@ REQ_MARKER
     execute_post_request "$REQ_STR" "$REQ_URL"
 }
 
-#
-# Makes a name for an ip intance
-# INPUT: the prefix (string) and optionally, length of the random part
-# in a new name
-function make_ip_instance_name(){
-    local prefix="$1"
-    local random_len="$2"
-    local stop="no"
-    local ipi_name=""
-    local fq_name="\"[$ipi_name]\""
-    local obj_uuid=""
-    local i=0;
-
-    while [ "$stop" != "yes" ]
-    do
-        if [ "$random_len" != "" ]
-        then
-            ipi_name="$prefix""_"`random_string $random_len`
-        else
-            ipi_name="$prefix""_$i"
-        fi
-        fq_name="[\"$ipi_name\"]"
-        obj_uuid=`fqname_to_uuid "$fq_name" "instance-ip"`
-        if [ -n $obj_uuid ]
-        then
-            stop="yes"
-        fi
-        i=`expr $i + 1`
-    done
-    echo $ipi_name
-}
-
-#
-# Creates a virtual machine interface
-# Input: name, virtual-network name
-#
+## @fn create_vm_interface()
+## @brief Creates a virtual machine interface
+## Input: name, virtual-network name
 function create_vm_interface(){
     local REQ_STR
     local vmi_name="$1"
@@ -701,7 +700,8 @@ REQ_MARKER
     execute_post_request "$REQ_STR" "$REQ_URL"
 }
 
-# Create vm interface if it is not present
+## @fn create_vm_interface_ifnp()
+## @brief Create vm interface if it is not present
 function create_vm_interface_ifnp() {
     local vmi_name="$1"
     local nw_name="$2"
@@ -714,9 +714,8 @@ function create_vm_interface_ifnp() {
     fi
 }
 
-#
-#
-#
+## @fn create_bgpaas()
+## @brief Create BPG-as-a-Service
 function create_bgpaas(){
     local REQ_STR
     local bgpaas_name="$1"
@@ -772,9 +771,8 @@ REQ_MARKER
     execute_post_request "$REQ_STR" "$REQ_URL"
 }
 
-#
-#
-# Creates a new logical router
+## @fn create_logical_router()
+## @brief Creates a new logical router
 function create_logical_router(){
     local REQ_STR
     local lr_name="$1"
@@ -1222,7 +1220,7 @@ function link_lr_with_vns(){
     done
 }
 
-function function get_lr_vn_name() {
+function get_lr_vn_name() {
     local lr_name="$1"
     local lr_fqname=`name_to_fqname "$lr_name"`
     local lr_uuid=`fqname_to_uuid "$lr_fqname" "logical-router"`
