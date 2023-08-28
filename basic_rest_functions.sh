@@ -21,6 +21,9 @@ declare -a HEX_DIGITS=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "
 ## @brief Ordered list of capital latin letters
 declare -a LAT_LETTERS=(A B C D E F G H I J K L M N O P Q R S T U V U W X Y Z)
 
+## @brief Contains name of log file
+declare CURL_LOG=log
+
 if [[ ! -v CONTROLLER_SETTINGS ]]
 then
     echo "Settings for controller (controller_settings.sh) were not found"
@@ -118,7 +121,7 @@ function execute_put_request(){
 }
 
 ## @fn execute_post_request()
-## @brief Executes POST REST request
+## @brief Executes POST REST request (creation of a new object)
 function execute_post_request(){
     local req_str="$1"
     local req_url="$2"
@@ -184,11 +187,17 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/fqname-to-id"
     local UUID_JSON=`execute_post_request "$REQ_STR" "$REQ_URL"`
-    UUID_STR=`jq -c -r '.uuid' <<< "$UUID_JSON"`
+    grep -q "uuid" <<< "$UUID_JSON"
+    local has_uuid=$?
+    local UUID_STR=""
+    if [ $has_uuid -eq 0 ]
+    then
+        UUID_STR=`jq -c -r '.uuid' <<< "$UUID_JSON"`
+    fi
     echo $UUID_STR
 }
 
-## @fn make_ipam_subnet_str
+## @fn make_ipam_subnet_str()
 ## @brief Creates a JSON representation for subnet object
 function make_ipam_subnet_str(){
     local prefix=$1
@@ -197,7 +206,7 @@ function make_ipam_subnet_str(){
     iss=$iss"\"dns_server_address\": \"$prefix""2\","
     iss=$iss" \"enable_dhcp\": true, \"default_gateway\": \"$prefix""1\","
     iss=$iss" \"addr_from_start\": true}"
-    echo $iss
+    echo "$iss"
 }
 
 ## @fn make_random_ipam_subnet_prefix_ipv4()
@@ -209,7 +218,7 @@ function make_random_ipam_subnet_prefix_ipv4(){
     subnet_prefix=$subnet_prefix"`random_dec_digit_max 6`"
 
     subnet_prefix="$1""$subnet_prefix"
-    echo $subnet_prefix
+    echo "$subnet_prefix"
 }
 
 ## @fn make_random_ipam_subnet_prefix_ipv6()
@@ -219,7 +228,7 @@ function make_random_ipam_subnet_prefix_ipv6(){
     subnet_prefix=$subnet_prefix"`random_hex_digit`"
     subnet_prefix=$subnet_prefix"`random_hex_digit`"
     subnet_prefix=$subnet_prefix"::"
-    echo $subnet_prefix
+    echo "$subnet_prefix"
 }
 
 ## @fn make_random_ipam_subnet_ipv6()
@@ -228,7 +237,7 @@ function make_random_ipam_subnet_ipv6(){
     local ipam_subnet_prefix=`make_random_ipam_subnet_prefix_ipv6`
     local prefix_len=16
     local ipam_subnet_str=`make_ipam_subnet_str $ipam_subnet_prefix $prefix_len`
-    echo $ipam_subnet_str
+    echo "$ipam_subnet_str"
 }
 
 ## @fn make_random_ipam_subnet_ipv4()
@@ -237,7 +246,7 @@ function make_random_ipam_subnet_ipv4(){
     local prefix_prep=$1
     local prefix=`make_random_ipam_subnet_prefix_ipv4 $prefix_prep`
     local ipam_subnet_str=
-    local n_dots=`echo $prefix_prep | grep -o "\." | wc -l` #search for dots
+    local n_dots=`echo "$prefix_prep" | grep -o "\." | wc -l` #search for dots
     if [ "$prefix_prep" = "" ] && [ $n_dots -eq 0 ]
     then
         prefix="$prefix"".0.0.0"
@@ -256,11 +265,13 @@ function make_random_ipam_subnet_ipv4(){
     echo $ipam_subnet_str    
 }
 
+## @fn make_ipam_subnet()
+## @brief Creates the JSON description for a subnet with the given prefix length 16
 function make_ipam_subnet(){
     local ipam_subnet_prefix=$1
     local prefix_len=16
     local ipam_subnet_str=`make_ipam_subnet_str $ipam_subnet_prefix $prefix_len`
-    echo $ipam_subnet_str
+    echo "$ipam_subnet_str"
 }
 
 ## @fn make_random_ipam_subnets_ipv6()
@@ -279,12 +290,13 @@ function make_random_ipam_subnets_ipv6(){
         fi
         i=`expr $i + 1`
     done
-    echo $subnets_str
+    echo "$subnets_str"
 }
 
-# Creates several ipv4 subnets
-# With a given constant prepended network part
-# Input: number of subnets, prepended part
+## @fn make_random_ipam_subnets_ipv4()
+## @brief Creates several ipv4 subnets
+## With a given constant prepended network part
+## Input: number of subnets, prepended part
 function make_random_ipam_subnets_ipv4(){
     local n_subnets=$1
     local prepend_part=$2
@@ -301,7 +313,7 @@ function make_random_ipam_subnets_ipv4(){
         fi
         i=`expr $i + 1`
     done
-    echo $subnets_str
+    echo "$subnets_str"
 }
 
 ## @fn make_ip_instance_name()
@@ -357,7 +369,7 @@ function add_reference() {
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/ref-update"
-    execute_post_request "$REQ_STR" "$REQ_URL"
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 ## @fn del_reference()
@@ -381,7 +393,7 @@ function del_reference() {
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/ref-update"
-    execute_post_request "$REQ_STR" "$REQ_URL"
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 
@@ -408,7 +420,7 @@ function network_ipam_subnets(){
 
     if [ "$nw_uuid" = "" ]
     then
-        echo "Network $nw_fqname not found"
+        echo "network_ipam_subnets: Network $nw_fqname not found"
     fi
 
     local CURL_RES=`execute_get_request $REQ_URL`
@@ -441,7 +453,7 @@ function network_set_ipams() {
     local nw_uuid=`fqname_to_uuid "$nw_fqname" virtual-network`
     if [ "$nw_uuid" = "" ]
     then
-        echo "Cant find $nw_fqname"
+        echo "network_set_ipams: Cant find $nw_fqname"
         return 1
     fi
 
@@ -468,10 +480,9 @@ function network_set_ipams() {
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-network/$nw_uuid"
-
     REQ_STR=`echo $REQ_STR`
-    echo "$REQ_STR"
-    execute_put_request "$REQ_STR" "$REQ_URL"
+
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 ## @fn create_network()
@@ -488,18 +499,16 @@ function create_network(){
     local has_v4_subnets=$?
     grep -q ":" <<< "$2"
     local has_v6_subnets=$?
-    if [ $has_v4_subnets ] || [ $has_v6_subnets ]
+    if [ $has_v4_subnets -eq 0 ] || [ $has_v6_subnets -eq 0 ]
     then
         for subnet in $2
         do
             local subnet_prefix_len=${subnet#*"/"}
             local slash_pos=$(( ${#subnet} - ${#subnet_prefix_len} - 1 ))
             local subnet_prefix="${subnet:0:$slash_pos}"
-            echo "$subnet $subnet_prefix_len $subnet_prefix"
             ipam_subnets="$ipam_subnets "`make_ipam_subnet_str $subnet_prefix $subnet_prefix_len`","
         done
         ipam_subnets=${ipam_subnets::-1} #remove last ","
-        echo $ipam_subnets
     else
         if [ "$ip_version" = "ipv4" ]
         then
@@ -526,9 +535,8 @@ function create_network(){
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-networks"
-
     REQ_STR=`echo $REQ_STR`
-    execute_post_request "$REQ_STR" "$REQ_URL"
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 ## @fn create_instance_ip()
@@ -569,7 +577,7 @@ function create_instance_ip(){
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/instance-ips"
-    execute_post_request "$REQ_STR" "$REQ_URL"
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 ## @fn create_instance_ip_ifnp()
@@ -627,7 +635,7 @@ function create_floating_ip(){
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/floating-ips"
-    execute_post_request "$REQ_STR" "$REQ_URL"
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 
@@ -662,7 +670,7 @@ function create_intf_route_table() {
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/interface-route-tables"
-    execute_post_request "$REQ_STR" "$REQ_URL"
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 ## @fn create_vm_interface()
@@ -695,9 +703,8 @@ read -r -d '' REQ_STR <<- REQ_MARKER
 }
 REQ_MARKER
 
-    echo "$REQ_STR"
     local REQ_URL="$REST_ADDRESS/virtual-machine-interfaces"
-    execute_post_request "$REQ_STR" "$REQ_URL"
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 ## @fn create_vm_interface_ifnp()
@@ -768,7 +775,7 @@ read -r -d '' REQ_STR <<- REQ_MARKER
 REQ_MARKER
 #        "virtual_machine_interface_refs " : [{"to" : $vmi_name}]
     local REQ_URL="$REST_ADDRESS/bgp-as-a-services"
-    execute_post_request "$REQ_STR" "$REQ_URL"
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 ## @fn create_logical_router()
@@ -797,8 +804,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/logical-routers"
     REQ_STR=`echo $REQ_STR`
-
-    execute_post_request "$REQ_STR" "$REQ_URL"
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 #
@@ -821,13 +827,13 @@ REQ_MARKER
     
     if [ "$lr_uuid" = "" ]
     then
+        echo "set_vni_for_logical_route: $lr_fqname not found"
         return 1
     fi
-    
     local REQ_URL="$REST_ADDRESS/logical-router/$lr_uuid"
-    
+
     REQ_STR=`echo $REQ_STR`
-    execute_put_request "$REQ_STR" "$REQ_URL"
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 function set_rt_for_logical_router() {
@@ -854,16 +860,14 @@ function set_rt_for_logical_router() {
     }
 REQ_MARKER
     
-    echo "REQ=$REQ_STR"
     if [ "$lr_uuid" = "" ]
     then
         return 1
     fi
     
     local REQ_URL="$REST_ADDRESS/logical-router/$lr_uuid"
-    
     REQ_STR=`echo $REQ_STR`
-    execute_put_request "$REQ_STR" "$REQ_URL"
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 
@@ -881,7 +885,7 @@ function link_iip_with_vmi(){
 
     if [ "$ipi_uuid" = "" ] || [ "$vmi_uuid" = "" ]
     then
-        echo "No $ipi_fqname or $vmi_fqname"
+        echo "link_iip_with_vmi: No $ipi_fqname or $vmi_fqname"
         return 1
     fi
 
@@ -895,8 +899,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/instance-ip/$ipi_uuid"
     REQ_STR=`echo $REQ_STR`
-
-    execute_put_request "$REQ_STR" "$REQ_URL"
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 function link_iip_with_vmis(){
@@ -907,7 +910,7 @@ function link_iip_with_vmis(){
 
     if [ "$ipi_uuid" = "" ]
     then
-        echo "No $ipi_fqname"
+        echo "link_iip_with_vmis: No $ipi_fqname"
         return 1
     fi
     
@@ -920,7 +923,7 @@ function link_iip_with_vmis(){
         vmi_uuid=`fqname_to_uuid "$vmi_fqname" "virtual-machine-interface"`
         if [ "$vmi_uuid" = "" ]
         then
-            echo "No $vmi_fqname"
+            echo "link_iip_with_vmis:No $vmi_fqname"
             return 1
         fi
         vmi_refs=$vmi_refs"{\"to\" : $vmi_fqname},"
@@ -937,7 +940,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/instance-ip/$ipi_uuid"
     REQ_STR=`echo $REQ_STR`
-    execute_put_request "$REQ_STR" "$REQ_URL"
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 #
@@ -959,7 +962,7 @@ function link_vmi_with_aap(){
     local vmi_uuid=`fqname_to_uuid "$vmi_fqname" "virtual-machine-interface"`
     if [ "$vmi_uuid" = "" ]
     then
-        echo "No $vmi_fqname"
+        echo "link_vmi_with_aap: No $vmi_fqname"
         return 1
     fi
 
@@ -978,8 +981,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-machine-interface/$vmi_uuid"
     REQ_STR=`echo $REQ_STR`
-
-    execute_put_request  "$REQ_STR" "$REQ_URL"
+    execute_put_request  "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 #
@@ -996,7 +998,7 @@ function link_fip_with_vmi(){
 
     if [ "$fip_uuid" = "" ]
     then
-        echo "No $fip_fqname"
+        echo "link_fip_with_vmi: No $fip_fqname"
         return 1
     fi
 
@@ -1012,10 +1014,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/floating-ip/$fip_uuid"
     REQ_STR=`echo $REQ_STR`
-
-    echo $REQ_STR
-
-    execute_put_request "$REQ_STR" "$REQ_URL"
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 #
@@ -1031,7 +1030,7 @@ function link_fip_with_vmis(){
 
     if [ "$fip_uuid" = "" ]
     then
-        echo "No $fip_fqname"
+        echo "link_fip_with_vmis: No $fip_fqname"
         return 1
     fi
 
@@ -1044,7 +1043,7 @@ function link_fip_with_vmis(){
         vmi_uuid=`fqname_to_uuid "$vmi_fqname" "virtual-machine-interface"`
         if [ "$vmi_uuid" = "" ]
         then
-            echo "No $vmi_fqname"
+            echo "link_fip_with_vmis: No $vmi_fqname"
             return 1
         fi
         vmi_refs=$vmi_refs"{\"to\" : $vmi_fqname},"
@@ -1063,10 +1062,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/floating-ip/$fip_uuid"
     REQ_STR=`echo $REQ_STR`
-
-    echo $REQ_STR
-
-    execute_put_request "$REQ_STR" "$REQ_URL"
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 #
@@ -1081,7 +1077,7 @@ function link_bgpaas_with_vmis(){
 
     if [ "$bgpaas_uuid" = "" ]
     then
-        echo "No $bgpaas_fqname"
+        echo "link_bgpaas_with_vmis: No $bgpaas_fqname"
         return 1
     fi
 
@@ -1094,7 +1090,7 @@ function link_bgpaas_with_vmis(){
         vmi_uuid=`fqname_to_uuid "$vmi_fqname" "virtual-machine-interface"`
         if [ "$vmi_uuid" = "" ]
         then
-            echo "No $vmi_fqname"
+            echo "link_bgpaas_with_vmis: No $vmi_fqname"
             return 1
         fi
         vmi_refs=$vmi_refs"{\"to\" : $vmi_fqname},"
@@ -1113,8 +1109,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/bgp-as-a-service/$bgpaas_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo $REQ_STR
-    execute_put_request "$REQ_STR" "$REQ_URL"
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 function link_irt_with_vmi(){
@@ -1126,7 +1121,7 @@ function link_irt_with_vmi(){
 
     if [ "$vmi_uuid" = "" ]
     then
-        echo "No $vmi_fqname"
+        echo "link_irt_with_vmi: No $vmi_fqname"
         return 1
     fi
 
@@ -1136,11 +1131,10 @@ function link_irt_with_vmi(){
     for irt in $irts
     do
         irt_fqname=`name_to_fqname "$irt"`
-        echo "$irt_fqname"
         irt_uuid=`fqname_to_uuid "$irt_fqname" "interface-route-table"`
         if [ "$irt_uuid" = "" ]
         then
-            echo "No $irt_fqname"
+            echo "link_irt_with_vmi: No $irt_fqname"
             return 1
         fi
         irt_refs=$irt_refs"{\"to\" : $irt_fqname},"
@@ -1160,7 +1154,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-machine-interface/$vmi_uuid"
     REQ_STR=`echo $REQ_STR`
-    execute_put_request "$REQ_STR" "$REQ_URL"
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
 #
@@ -1175,7 +1169,7 @@ function link_lr_with_vns(){
 
     if [ "$lr_uuid" = "" ]
     then
-        echo "No $lr_name"
+        echo "link_lr_with_vns: No $lr_fqname, uuid = $lr_uuid"
         return 1
     fi
 
@@ -1226,7 +1220,7 @@ function get_lr_vn_name() {
     local lr_uuid=`fqname_to_uuid "$lr_fqname" "logical-router"`
     if [ "$lr_uuid" = "" ]
     then
-        echo "Cant find logical router $lr_fqname"
+        echo "get_lr_vn_name: Cant find logical router $lr_fqname"
         return 1
     fi
     local lr_vn_name="__contrail_lr_internal_vn_$lr_uuid""__"
@@ -1244,7 +1238,7 @@ function get_lr_vrf_name() {
         echo "$lr_vrf_name"
         return 0
     fi
-    echo "unknown_lr_name"
+    echo "get_lr_vrf_name: unknown_lr_name"
     return 1
 }
 
@@ -1264,7 +1258,7 @@ function delete_floating_ips(){
         iip_name="${iip_fip:0:$fip_pos}"
 
         fip_fqname="[\"$iip_name\", \"$fip_name\"]"
-        echo "Deleting $fip_fqname"
+        echo "Deleting $fip_fqname" >> $CURL_LOG
         fip_uuid=`fqname_to_uuid "$fip_fqname" "floating-ip"`
         if [ "$fip_uuid" != "" ]
         then
@@ -1278,7 +1272,7 @@ function delete_instance_ips(){
     for ipi in $ipis
     do
         local ipi_fqname="[\"$ipi\"]"
-        echo "Deleting $ipi_fqname"
+        echo "Deleting $ipi_fqname" >> $CURL_LOG
         local ipi_uuid=`fqname_to_uuid "$ipi_fqname" "instance-ip"`
         if [ "$ipi_uuid" != "" ]
         then
@@ -1292,7 +1286,7 @@ function delete_vm_interfaces(){
     for vmi in $vmis
     do
         local vmi_fqname=`name_to_fqname $vmi`
-        echo "Deleting $vmi_fqname"
+        echo "Deleting $vmi_fqname" >> $CURL_LOG
         local vmi_uuid=`fqname_to_uuid "$vmi_fqname" "virtual-machine-interface"`
         if [ "$vmi_uuid" != "" ]
         then
@@ -1306,7 +1300,7 @@ function delete_bgpaases(){
     for bgpaas in $bgps
     do
         local bgpaas_fqname=`name_to_fqname $bgpaas`
-        echo "Deleting $bgpaas_fqname"
+        echo "Deleting $bgpaas_fqname" >> $CURL_LOG
         local bgpaas_uuid=`fqname_to_uuid "$bgpaas_fqname" "bgp-as-a-service"`
         if [ "$bgpaas_uuid" != "" ]
         then
@@ -1319,7 +1313,7 @@ function delete_networks(){
     local networks="$1"
     for nw in $networks
     do
-        echo "Deleting nw $nw"
+        echo "Deleting nw $nw" >> $CURL_LOG
         nw_fqname=`name_to_fqname $nw`
         nw_uuid=`fqname_to_uuid "$nw_fqname" "virtual-network"`
         delete_entity "$nw_uuid" "virtual-network"

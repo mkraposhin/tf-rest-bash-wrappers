@@ -125,6 +125,31 @@ function vr_state(){
     #echo "Eo"
 }
 
+function check_state_result() {
+    local result=$1
+    local reference=$2
+    local check_res=$?
+    return $check_res
+}
+
+function results_are_ok() {
+    local all_ok=0
+    for res in "$@"
+    do
+        if [ $res -ne 0 ]
+        then
+            all_ok=1
+            break
+        fi
+    done
+    if [ $all_ok -ne 0 ]
+    then
+        echo "results_are_ok: $@"
+        return 1
+    fi
+    return 0
+}
+
 export AUXILIARY_FUNCTIONS=
 
 #
