@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['hex_5fdigits_0',['HEX_DIGITS',['../basic__rest__functions_8sh.html#a9ede953a9867c5217d9b5cc98d902cfc',1,'basic_rest_functions.sh']]]
+  ['del_5freference_0',['del_reference',['../basic__rest__functions_8sh.html#aa82212c521013dd699e8bc278824a307',1,'basic_rest_functions.sh']]],
+  ['delete_5fentity_1',['delete_entity',['../basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2',1,'basic_rest_functions.sh']]]
 ];
