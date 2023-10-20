@@ -158,6 +158,32 @@ function prefix_to_ip(){
     echo ${prefix_str:0:$slash_pos}
 }
 
+## @fn is_ipv6_address()
+## @brief Determines whether a given address belongs to IPv6 range
+function is_ipv6_address(){
+    grep -q ":" <<< "$1"
+    if [ $? -eq 0 ]
+    then
+        echo "yes"
+        return 0
+    fi
+    echo "no"
+    return 1
+}
+
+## @fn is_ipv4_address()
+## @brief Determines whether a given address belongs to IPv4 range
+function is_ipv4_address(){
+    grep -q "." <<< "$1"
+    if [ $? -eq 0 ]
+    then
+        echo "yes"
+        return 0
+    fi
+    echo "no"
+    return 1
+}
+
 ## @fn fqname_json_to_csv()
 ## @brief Returns fqname in the CSV format
 function fqname_json_to_csv() {
@@ -339,7 +365,7 @@ function make_ip_instance_name(){
         fi
         fq_name="[\"$ipi_name\"]"
         obj_uuid=`fqname_to_uuid "$fq_name" "instance-ip"`
-        if [ -n $obj_uuid ]
+        if [ "$obj_uuid" != "" ]
         then
             stop="yes"
         fi
@@ -369,6 +395,7 @@ function add_reference() {
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/ref-update"
+    echo >> $CURL_LOG
     execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -393,6 +420,7 @@ function del_reference() {
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/ref-update"
+    echo >> $CURL_LOG
     execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -448,6 +476,14 @@ function network_ipam_subnets(){
 function network_set_ipams() {
     local nw_name="$1"
     local new_ipam_prefixes="$2"
+    local ipam_name="$3"
+    local ipam_fqname=`name_to_fqname "$ipam_name"`
+    local ipam_uuid=`fqname_to_uuid "$ipam_fqname" "network-ipam"`
+    if [ "$ipam_uuid" = "" ]
+    then
+        echo "switching to default ipam from: $ipam_fqname"
+        ipam_fqname="[\"default-domain\", \"default-project\", \"default-network-ipam\"]"
+    fi
     
     local nw_fqname=`name_to_fqname "$nw_name"`
     local nw_uuid=`fqname_to_uuid "$nw_fqname" virtual-network`
@@ -457,6 +493,7 @@ function network_set_ipams() {
         return 1
     fi
 
+    local ipam_subnets=""
     for subnet in $new_ipam_prefixes
     do
         local subnet_prefix_len=${subnet#*"/"}
@@ -472,7 +509,7 @@ function network_set_ipams() {
         {
             "network_ipam_refs":
             [{
-                "to": ["default-domain", "default-project", "default-network-ipam"],
+                "to": $ipam_fqname,
                 "attr" : {"ipam_subnets":[$ipam_subnets]}
             }]
         }
@@ -481,7 +518,40 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-network/$nw_uuid"
     REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+}
 
+## @fn floating_ip_set_address()
+## @brief Sets a new IP address for the given FIP
+function floating_ip_set_address() {
+    local iip_fip="$1"
+    local fip_address="$2"
+
+    local fip_name=${iip_fip#*","}
+    local fip_pos=$(( ${#iip_fip} - ${#fip_name} - 1 ))
+    local iip_name="${iip_fip:0:$fip_pos}"
+    local fip_fqname="[\"$iip_name\",\"$fip_name\"]"
+    local fip_uuid=`fqname_to_uuid "$fip_fqname" "floating-ip"`
+    if [ "$fip_uuid" = "" ]
+    then
+        echo "floating_ip_set_address: Cant find $fip_fqname"
+        return 1
+    fi
+
+    read -r -d '' REQ_STR <<- REQ_MARKER
+    {
+        "floating-ip":
+        {
+            "floating_ip_address": "$fip_address"
+        }
+    }
+REQ_MARKER
+
+    echo $REQ_STR
+    local REQ_URL="$REST_ADDRESS/floating-ip/$fip_uuid"
+    REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
     execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -513,7 +583,9 @@ function create_network(){
         if [ "$ip_version" = "ipv4" ]
         then
             ipam_subnets=`make_random_ipam_subnets_ipv4 $n_ipam_subnets "10.0."`
-        else
+        fi
+        if [ "$ip_version" = "ipv6" ]
+        then
             ipam_subnets=`make_random_ipam_subnets_ipv6 $n_ipam_subnets`
         fi
     fi
@@ -536,6 +608,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-networks"
     REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
     execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -577,6 +650,7 @@ function create_instance_ip(){
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/instance-ips"
+    echo >> $CURL_LOG
     execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -635,6 +709,7 @@ function create_floating_ip(){
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/floating-ips"
+    echo >> $CURL_LOG
     execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -670,6 +745,7 @@ function create_intf_route_table() {
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/interface-route-tables"
+    echo >> $CURL_LOG
     execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -686,7 +762,7 @@ function create_vm_interface(){
     then
         return 1;
     fi
-    if [ -n "$aux_args" ]
+    if [ "$aux_args" != "" ]
     then
         aux_args=","$aux_args
     fi
@@ -704,6 +780,7 @@ read -r -d '' REQ_STR <<- REQ_MARKER
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-machine-interfaces"
+    echo >> $CURL_LOG
     execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -775,6 +852,7 @@ read -r -d '' REQ_STR <<- REQ_MARKER
 REQ_MARKER
 #        "virtual_machine_interface_refs " : [{"to" : $vmi_name}]
     local REQ_URL="$REST_ADDRESS/bgp-as-a-services"
+    echo >> $CURL_LOG
     execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -804,8 +882,93 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/logical-routers"
     REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
     execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
+
+# @fn create_virtual_dns()
+# @brief creates a new virtual DNS server.
+function create_virtual_dns() {
+    local dns_name="$1"
+    local domain_name="$2"
+    local next_virtual_dns="$3"
+    local next_virtual_dns_line=
+    if [ "$next_virtual_dns" != "" ]
+    then
+        next_virtual_dns_line=\"next_virtual_DNS\":\"$next_virtual_dns\",
+    fi
+    local dns_fqname="[\"default-domain\",\"$dns_name\"]"
+    local REQ_STR=
+    read -r -d '' REQ_STR <<- REQ_MARKER
+    {
+            "virtual-DNS": {
+            "parent_type": "domain",
+            "fq_name": $dns_fqname,
+            "virtual_DNS_data": {
+                "domain_name": "$domain_name",
+                $next_virtual_dns_line
+                "reverse_resolution": true,
+                "external_visible": true,
+                "default_ttl_seconds": 86400,
+                "record_order": "random",
+                "dynamic_records_from_client": true,
+                "floating_ip_record": "vm-name"
+            }
+        }
+    }
+REQ_MARKER
+
+    local REQ_URL="$REST_ADDRESS/virtual-DNSs"
+    REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+}
+
+# @fn create_ipam()
+# @brief Creates a new IPAM with a given DNS server
+function create_ipam(){
+    local ipam_name="$1"
+    local ipam_fqname=`name_to_fqname "$ipam_name"`
+    local vdns_name="$2"
+    local vdns_fqname="[\"default-domain\",\"$vdns_name\"]"
+    local vdns_uuid=`fqname_to_uuid "$vdns_fqname" "virtual-DNS"`    
+    local vdns_csv_fqname=
+    local vdns_ref_line=
+    local vdns_ref2_line=
+    if [ "$vdns_uuid" != "" ]
+    then
+        vdns_csv_fqname=`fqname_json_to_csv "$vdns_fqname"`
+        vdns_ref_line=\"virtual_dns_server_name\":\"$vdns_csv_fqname\"
+        vdns_ref2_line="{\"to\":$vdns_fqname}"
+    fi
+
+    local REQ_STR=
+    read -r -d '' REQ_STR <<- REQ_MARKER
+    {
+            "network-ipam": {
+            "parent_type": "project",
+            "fq_name": $ipam_fqname,
+            "network_ipam_mgmt": {
+                "ipam_dns_method": "virtual-dns-server",
+                "ipam_dns_server": {
+                    $vdns_ref_line
+                }
+            },
+            "virtual_DNS_refs": [
+                $vdns_ref2_line
+            ]
+        }
+    }
+REQ_MARKER
+
+    echo $REQ_STR
+    local REQ_URL="$REST_ADDRESS/network-ipams"
+    REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+}
+
+
 
 #
 #
@@ -833,6 +996,7 @@ REQ_MARKER
     local REQ_URL="$REST_ADDRESS/logical-router/$lr_uuid"
 
     REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
     execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -867,6 +1031,7 @@ REQ_MARKER
     
     local REQ_URL="$REST_ADDRESS/logical-router/$lr_uuid"
     REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
     execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -878,7 +1043,7 @@ function link_iip_with_vmi(){
     local ipi_name="$1"
     local vmi_name="$2"
     local ipi_fqname="[\"$ipi_name\"]"
-    local vmi_fqname=`name_to_fqname $vmi_name`
+    local vmi_fqname=`name_to_fqname "$vmi_name"`
 
     local ipi_uuid=`fqname_to_uuid "$ipi_fqname" "instance-ip"`
     local vmi_uuid=`fqname_to_uuid "$vmi_fqname" "virtual-machine-interface"`
@@ -899,6 +1064,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/instance-ip/$ipi_uuid"
     REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
     execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -940,6 +1106,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/instance-ip/$ipi_uuid"
     REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
     execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -981,6 +1148,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-machine-interface/$vmi_uuid"
     REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
     execute_put_request  "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -994,7 +1162,7 @@ function link_fip_with_vmi(){
 
     local fip_fqname="[\"$ipi_name\",\"$fip_name\"]"
     local fip_uuid=`fqname_to_uuid "$fip_fqname" "floating-ip"`
-    local vmi_fqname="name_to_fqname $vmi_name"
+    local vmi_fqname=`name_to_fqname $vmi_name`
 
     if [ "$fip_uuid" = "" ]
     then
@@ -1014,6 +1182,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/floating-ip/$fip_uuid"
     REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
     execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -1062,6 +1231,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/floating-ip/$fip_uuid"
     REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
     execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -1109,6 +1279,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/bgp-as-a-service/$bgpaas_uuid"
     REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
     execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -1154,6 +1325,7 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-machine-interface/$vmi_uuid"
     REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
     execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
 }
 
@@ -1258,7 +1430,6 @@ function delete_floating_ips(){
         iip_name="${iip_fip:0:$fip_pos}"
 
         fip_fqname="[\"$iip_name\", \"$fip_name\"]"
-        echo "Deleting $fip_fqname" >> $CURL_LOG
         fip_uuid=`fqname_to_uuid "$fip_fqname" "floating-ip"`
         if [ "$fip_uuid" != "" ]
         then
@@ -1388,6 +1559,28 @@ function delete_intf_route_table() {
     if [ "$irt_uuid" != "" ]
     then
         delete_entity "$irt_uuid" "interface-route-table"
+    fi
+}
+
+function delete_virtual_dns() {
+    local dns_name="$1"
+    local dns_fqname="[\"default-domain\",\"$dns_name\"]"
+    local dns_uuid=`fqname_to_uuid "$dns_fqname" "virtual-DNS"`
+
+    if [ "$dns_uuid" != "" ]
+    then
+        delete_entity "$dns_uuid" "virtual-DNS"
+    fi
+}
+
+function delete_ipam() {
+    local ipam_name="$1"
+    local ipam_fqname=`name_to_fqname "$ipam_name"`
+    local ipam_uuid=`fqname_to_uuid "$ipam_fqname" "network-ipam"`
+
+    if [ "$ipam_uuid" != "" ]
+    then
+        delete_entity "$ipam_uuid" "network-ipam"
     fi
 }
 
