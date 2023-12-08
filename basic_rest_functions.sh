@@ -223,6 +223,38 @@ REQ_MARKER
     echo $UUID_STR
 }
 
+## @fn set_config_field()
+## @brief Takes JSON config and sets the given field in it to the given value
+function set_config_field() {
+    local config="$1"
+    local field_name="$2"
+    local value="$3"
+    local fields=`jq -c -r 'keys[]'  <<< "$config" `
+    local mod_config=
+    local t_value=
+    local has_nested=
+    for field in $fields
+    do
+        t_value=`jq -c -r ".$field" <<< "$config"`
+        if [ "$field" = "$field_name" ]
+        then
+            t_value="$value"           
+        fi
+        ! grep -q ']' <<< "$t_value" && ! grep -q '}' <<< "$t_value"
+        local has_nested=$?
+        if [ $has_nested -eq 0 ]
+        then
+            t_value=\"$t_value\"
+        fi
+        t_value="\"$field\":$t_value"
+        #echo "$t_value"
+        mod_config="$t_value"",""$mod_config"
+    done
+    mod_config=${mod_config::-1} #remove last ","
+    mod_config="{$mod_config}"
+    echo $mod_config
+}
+
 ## @fn make_ipam_subnet_str()
 ## @brief Creates a JSON representation for subnet object
 function make_ipam_subnet_str(){
@@ -1083,6 +1115,8 @@ function link_iip_with_vmis(){
     local vmi_fqname=
     local vmi_uuid=
     local vmi_refs=
+    echo "ipi_name=$ipi_name"
+    echo "vmis=$vmis"
     for vmi in $vmis
     do
         vmi_fqname=`name_to_fqname $vmi`
@@ -1414,7 +1448,159 @@ function get_lr_vrf_name() {
     return 1
 }
 
-function delete_floating_ips(){
+function get_ll_services() {
+    local gvr_fqname="$1"
+    local gvr_uuid=`fqname_to_uuid "$gvr_fqname" "global-vrouter-config"`
+    if [ "$gvr_uuid" = "" ]
+    then
+        echo "UUID for $gvr_fqname was not found"
+        return 1
+    fi
+
+    local REQ_URL="$REST_ADDRESS/global-vrouter-config/$gvr_uuid"
+    local CURL_RES=`execute_get_request $REQ_URL`
+
+    if [ "$CURL_RES" = "" ]
+    then
+        echo "Unable to request global vrouter config"
+        return 1
+    fi
+
+    local ll_services_dict=`jq -c -r '."global-vrouter-config".linklocal_services.linklocal_service_entry' <<< "$CURL_RES"`
+    echo "$ll_services_dict"
+
+    #local VNW_DICT=`jq -c -r '.["virtual-network"]' <<< "$CURL_RES"`
+    #local IPAM_REFS_DICT=`jq -c -r '.["network_ipam_refs"]' <<< "$VNW_DICT"`
+    #local IPAMS_DICT=`jq -c -r '.[0].attr.ipam_subnets' <<< "$IPAM_REFS_DICT"`
+}
+
+function add_ll_service() {
+    local gvr_fqname="$1"
+    local ll_service_config="$2"
+    local new_ll_service="$3"
+    local ll_config=`get_ll_services "$gvr_fqname"`
+    if [ "$ll_config" = "" ]
+    then
+        echo "Cant retrieve link local services"
+        return 1
+    fi
+    #
+    local gvr_uuid=`fqname_to_uuid "$gvr_fqname" "global-vrouter-config"`
+    if [ "$gvr_uuid" = "" ]
+    then
+        echo "UUID for $gvr_fqname was not found"
+        return 1
+    fi
+    #
+    local first_pos=`echo $ll_config | grep -ob "\[" | grep -oE "[0-9]+" | head -n 1`
+    first_pos=`expr $first_pos + 1`
+    local last_pos=`echo $ll_config | grep -ob "]" | grep -oE "[0-9]+" | tail -n 1`
+    local length=`expr $last_pos - $first_pos`
+    local new_conf=${ll_config:$first_pos:$length}
+    new_conf="[$new_conf,$new_ll_service]"
+    # echo $new_conf
+
+    local REQ_STR=
+    read -r -d '' REQ_STR <<- REQ_MARKER
+    {
+        "global-vrouter-config":
+        {
+            "linklocal_services":
+            {
+                "linklocal_service_entry":$new_conf
+            }
+        }
+    }
+REQ_MARKER
+    local REQ_URL="$REST_ADDRESS/global-vrouter-config/$gvr_uuid"
+    REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
+    echo $REQ_STR
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+}
+
+function get_ll_service_config() {
+    local ll_services="$1"
+    local ll_service_name="$2"
+    local n_ll_services=`jq -c -r '. | length' <<< "$ll_services"`
+    local i_service=0
+    
+    local ll_config=
+    local ll_name=
+    while [ $i_service -lt $n_ll_services ]
+    do
+        ll_config=`jq -c -r ".[$i_service]" <<< "$ll_services"`
+        ll_name=`jq -c -r ".linklocal_service_name" <<< "$ll_config"`
+        if [ "$ll_name" = "$ll_service_name" ]
+        then
+            break
+        fi
+        i_service=`expr $i_service + 1`
+    done
+    if [ "$ll_name" != "" ]
+    then
+        echo $ll_config
+        return 0
+    fi
+    echo "Link local service was not found"
+    return 1
+}
+
+function del_ll_service() {
+    local gvr_fqname="$1"
+    local ll_service_name="$2"
+    local ll_services_config=`get_ll_services "$gvr_fqname"`
+    if [ "$ll_services_config" = "" ]
+    then
+        echo "Cant retrieve link local services"
+        return 1
+    fi
+    #
+    local gvr_uuid=`fqname_to_uuid "$gvr_fqname" "global-vrouter-config"`
+    if [ "$gvr_uuid" = "" ]
+    then
+        echo "UUID for $gvr_fqname was not found"
+        return 1
+    fi
+    local n_services=`jq -c -r '. | length' <<< "$ll_services_config"`
+    local i_service=0
+    local ll_config=
+    local ll_name=
+    local new_ll_config=
+    while [ $i_service -lt $n_services ]
+    do
+        ll_config=`jq -c -r ".[$i_service]" <<< "$ll_services_config"`
+        ll_name=`jq -c -r ".linklocal_service_name" <<< "$ll_config"`
+        # echo "ll_config=$ll_config"
+        if [ ! "$ll_name" = "$ll_service_name" ]
+        then
+            new_ll_config="$ll_config,$new_ll_config"
+        fi
+        i_service=`expr $i_service + 1`
+    done
+    new_ll_config=${new_ll_config::-1} #remove last ","
+    new_ll_config="[$new_ll_config]"
+
+    local REQ_STR=
+    read -r -d '' REQ_STR <<- REQ_MARKER
+    {
+        "global-vrouter-config":
+        {
+            "linklocal_services":
+            {
+                "linklocal_service_entry":$new_ll_config
+            }
+        }
+    }
+REQ_MARKER
+    local REQ_URL="$REST_ADDRESS/global-vrouter-config/$gvr_uuid"
+    REQ_STR=`echo $REQ_STR`
+    echo >> $CURL_LOG
+    echo $REQ_STR
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+}
+
+function delete_floating_ips() {
     local iip_fips="$1"
 
     local iip_name=
