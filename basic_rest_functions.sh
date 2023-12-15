@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 ## @file
-## @brief A set of functions to talk to the TF Agent REST server
+## @brief A set of functions to talk to the TF Config REST server
 ## @author Matvey Kraposhin
 
 if [[ -v BASIC_REST_FUNCTIONS ]]
