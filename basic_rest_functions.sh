@@ -22,7 +22,7 @@ declare -a HEX_DIGITS=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "
 declare -a LAT_LETTERS=(A B C D E F G H I J K L M N O P Q R S T U V U W X Y Z)
 
 ## @brief Contains name of log file
-declare CURL_LOG=log
+declare MESG_LOG=log
 
 if [[ ! -v CONTROLLER_SETTINGS ]]
 then
@@ -280,7 +280,7 @@ function make_random_ipam_subnet_prefix_ipv4(){
 }
 
 ## @fn make_random_ipam_subnet_prefix_ipv6()
-## @brief Creates random IPv6 subnet prefix of a given length
+## @brief Creates random IPv6 subnet prefix of of length 24 (3 digits)
 function make_random_ipam_subnet_prefix_ipv6(){
     subnet_prefix=$subnet_prefix"`random_hex_digit`"
     subnet_prefix=$subnet_prefix"`random_hex_digit`"
@@ -293,7 +293,7 @@ function make_random_ipam_subnet_prefix_ipv6(){
 ## @brief Creates JSON description of IPv6 subnet of length 16
 function make_random_ipam_subnet_ipv6(){
     local ipam_subnet_prefix=`make_random_ipam_subnet_prefix_ipv6`
-    local prefix_len=16
+    local prefix_len=24
     local ipam_subnet_str=`make_ipam_subnet_str $ipam_subnet_prefix $prefix_len`
     echo "$ipam_subnet_str"
 }
@@ -397,7 +397,7 @@ function make_ip_instance_name(){
         fi
         fq_name="[\"$ipi_name\"]"
         obj_uuid=`fqname_to_uuid "$fq_name" "instance-ip"`
-        if [ "$obj_uuid" != "" ]
+        if [ "$obj_uuid" = "" ]
         then
             stop="yes"
         fi
@@ -427,8 +427,8 @@ function add_reference() {
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/ref-update"
-    echo >> $CURL_LOG
-    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 ## @fn del_reference()
@@ -452,8 +452,8 @@ function del_reference() {
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/ref-update"
-    echo >> $CURL_LOG
-    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 
@@ -480,7 +480,9 @@ function network_ipam_subnets(){
 
     if [ "$nw_uuid" = "" ]
     then
-        echo "network_ipam_subnets: Network $nw_fqname not found"
+        echo "network_ipam_subnets: Network $nw_fqname not found" >> $MESG_LOG
+        echo ""
+        return 1
     fi
 
     local CURL_RES=`execute_get_request $REQ_URL`
@@ -489,6 +491,10 @@ function network_ipam_subnets(){
     local IPAM_REFS_DICT=`jq -c -r '.["network_ipam_refs"]' <<< "$VNW_DICT"`
     local IPAMS_DICT=`jq -c -r '.[0].attr.ipam_subnets' <<< "$IPAM_REFS_DICT"`
     local N_SUBNETS=`jq -c -r '. | length' <<< "$IPAMS_DICT"`
+    if [ "$N_SUBNETS" = "" ]
+    then
+        N_SUBNETS=0
+    fi
 
     local i_subnet=0
     local IPAM_UUIDS=""
@@ -499,7 +505,7 @@ function network_ipam_subnets(){
         IPAM_UUIDS=$IPAM_UUIDS" $subnet_uuid"
         i_subnet=`expr $i_subnet + 1`
     done
-    
+
     echo $IPAM_UUIDS
 }
 
@@ -550,8 +556,8 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-network/$nw_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 ## @fn floating_ip_set_address()
@@ -583,8 +589,8 @@ REQ_MARKER
     echo $REQ_STR
     local REQ_URL="$REST_ADDRESS/floating-ip/$fip_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 ## @fn create_network()
@@ -640,8 +646,8 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-networks"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 ## @fn create_instance_ip()
@@ -656,7 +662,7 @@ function create_instance_ip(){
 
     if [ "$ipi_name" = "" ] || [ "$nw_name" = "" ] || [ "$subnet_uuid" = "" ]
     then
-        echo "ipi_name=$ipi_name, nw_name=$nw_name, subnet_uuid=$subnet_uuid"
+        echo "create_instance_ip error: ipi_name=$ipi_name, nw_name=$nw_name, subnet_uuid=$subnet_uuid" >> $MESG_LOG
         return 1;
     fi
 
@@ -680,10 +686,10 @@ function create_instance_ip(){
         }
     }
 REQ_MARKER
-
+    echo "$REQ_STR" 1>&2
     local REQ_URL="$REST_ADDRESS/instance-ips"
-    echo >> $CURL_LOG
-    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 ## @fn create_instance_ip_ifnp()
@@ -741,8 +747,8 @@ function create_floating_ip(){
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/floating-ips"
-    echo >> $CURL_LOG
-    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 
@@ -777,8 +783,8 @@ function create_intf_route_table() {
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/interface-route-tables"
-    echo >> $CURL_LOG
-    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 ## @fn create_vm_interface()
@@ -812,8 +818,8 @@ read -r -d '' REQ_STR <<- REQ_MARKER
 REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-machine-interfaces"
-    echo >> $CURL_LOG
-    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 ## @fn create_vm_interface_ifnp()
@@ -884,8 +890,8 @@ read -r -d '' REQ_STR <<- REQ_MARKER
 REQ_MARKER
 #        "virtual_machine_interface_refs " : [{"to" : $vmi_name}]
     local REQ_URL="$REST_ADDRESS/bgp-as-a-services"
-    echo >> $CURL_LOG
-    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 ## @fn create_logical_router()
@@ -914,8 +920,8 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/logical-routers"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 # @fn create_virtual_dns()
@@ -952,8 +958,8 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-DNSs"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 # @fn create_ipam()
@@ -996,8 +1002,8 @@ REQ_MARKER
     echo $REQ_STR
     local REQ_URL="$REST_ADDRESS/network-ipams"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_post_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 
@@ -1028,8 +1034,8 @@ REQ_MARKER
     local REQ_URL="$REST_ADDRESS/logical-router/$lr_uuid"
 
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 function set_rt_for_logical_router() {
@@ -1063,8 +1069,8 @@ REQ_MARKER
     
     local REQ_URL="$REST_ADDRESS/logical-router/$lr_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 
@@ -1096,8 +1102,8 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/instance-ip/$ipi_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 function link_iip_with_vmis(){
@@ -1140,8 +1146,8 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/instance-ip/$ipi_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 #
@@ -1182,8 +1188,8 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-machine-interface/$vmi_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_put_request  "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_put_request  "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 #
@@ -1216,8 +1222,8 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/floating-ip/$fip_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 #
@@ -1265,8 +1271,8 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/floating-ip/$fip_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 #
@@ -1313,8 +1319,8 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/bgp-as-a-service/$bgpaas_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 function link_irt_with_vmi(){
@@ -1359,8 +1365,8 @@ REQ_MARKER
 
     local REQ_URL="$REST_ADDRESS/virtual-machine-interface/$vmi_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
-    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    echo >> $MESG_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 #
@@ -1514,9 +1520,9 @@ function add_ll_service() {
 REQ_MARKER
     local REQ_URL="$REST_ADDRESS/global-vrouter-config/$gvr_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
+    echo >> $MESG_LOG
     echo $REQ_STR
-    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 function get_ll_service_config() {
@@ -1595,9 +1601,9 @@ function del_ll_service() {
 REQ_MARKER
     local REQ_URL="$REST_ADDRESS/global-vrouter-config/$gvr_uuid"
     REQ_STR=`echo $REQ_STR`
-    echo >> $CURL_LOG
+    echo >> $MESG_LOG
     echo $REQ_STR
-    execute_put_request "$REQ_STR" "$REQ_URL" >> $CURL_LOG
+    execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
 function delete_floating_ips() {
@@ -1629,7 +1635,7 @@ function delete_instance_ips(){
     for ipi in $ipis
     do
         local ipi_fqname="[\"$ipi\"]"
-        echo "Deleting $ipi_fqname" >> $CURL_LOG
+        echo "Deleting $ipi_fqname" >> $MESG_LOG
         local ipi_uuid=`fqname_to_uuid "$ipi_fqname" "instance-ip"`
         if [ "$ipi_uuid" != "" ]
         then
@@ -1643,7 +1649,7 @@ function delete_vm_interfaces(){
     for vmi in $vmis
     do
         local vmi_fqname=`name_to_fqname $vmi`
-        echo "Deleting $vmi_fqname" >> $CURL_LOG
+        echo "Deleting $vmi_fqname" >> $MESG_LOG
         local vmi_uuid=`fqname_to_uuid "$vmi_fqname" "virtual-machine-interface"`
         if [ "$vmi_uuid" != "" ]
         then
@@ -1657,7 +1663,7 @@ function delete_bgpaases(){
     for bgpaas in $bgps
     do
         local bgpaas_fqname=`name_to_fqname $bgpaas`
-        echo "Deleting $bgpaas_fqname" >> $CURL_LOG
+        echo "Deleting $bgpaas_fqname" >> $MESG_LOG
         local bgpaas_uuid=`fqname_to_uuid "$bgpaas_fqname" "bgp-as-a-service"`
         if [ "$bgpaas_uuid" != "" ]
         then
@@ -1670,18 +1676,23 @@ function delete_networks(){
     local networks="$1"
     for nw in $networks
     do
-        echo "Deleting nw $nw" >> $CURL_LOG
+        echo "Deleting nw $nw" >> $MESG_LOG
         nw_fqname=`name_to_fqname $nw`
         nw_uuid=`fqname_to_uuid "$nw_fqname" "virtual-network"`
         delete_entity "$nw_uuid" "virtual-network"
     done
 }
 
+# @fn prefix_delete_vm_interfaces
+# @brief This deletes all vmi's with a given prefix
 function prefix_delete_vm_interfaces(){
     local vm_prefix=$1
-#this deletes all vmi's with a given prefix
+    if [ "$vm_prefix" = "" ]
+    then
+        return 1
+    fi
     local myvmis=`curl $REST_ADDRESS/virtual-machine-interfaces\
-        | python3 -m json.tool | grep $vm_prefix`
+        | python3 -m json.tool | grep "$vm_prefix"`
     local vmis_stripped=""
     for vmi in $myvmis
     do
@@ -1692,11 +1703,16 @@ function prefix_delete_vm_interfaces(){
     delete_vm_interfaces "$vmis_stripped"
 }
 
+# @fn prefix_delete_ip_instances
+# @brief This deletes all IP instances with a given prefix
 function prefix_delete_ip_instances(){
-#this deletes all ipi's with a given prefix
     local ipi_prefix=$1
+    if [ "$ipi_prefix" = "" ]
+    then
+        return 1
+    fi
     local myipis=`curl $REST_ADDRESS/instance-ips\
-        | python3 -m json.tool | grep $ipi_prefix`
+        | python3 -m json.tool | grep "$ipi_prefix"`
     local ipis_stripped=""
     for ipi in $myipis
     do

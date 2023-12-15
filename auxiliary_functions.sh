@@ -90,6 +90,50 @@ function ping_function(){
     echo "OK" > $RES_FOLDER/$RES_PREFIX$ping_id
 }
 
+## @fn curl_function()
+## @brief runs curl for the given IPv6 address from
+## the given virtual machine
+curl_function(){
+    local where_addr=$1
+    local ip_port=$2
+    local from_intf=$3
+    local conn_time=$4 #can be used as connection timeout --connect-timeout, --max-time
+    local curl_id=$5
+    local vm_user=$6
+    local vm_ip=$7
+    if [ "$IDENT_FILE" = "" ]
+    then
+        echo "Identity file was not specified"
+        return 1
+    fi
+    local conn_timeout=`expr ${#vms_list[@]} \* $conn_time`
+    local curl_out=`ssh -i $IDENT_FILE \
+        $vm_user@$vm_ip "curl -6 --connect-timeout $conn_timeout \
+        http://[$where_addr%$from_intf]:$ip_port"`
+
+    # local interm=`echo $curl_out | grep "latest" -o`
+    local n_success_res=`echo $curl_out | grep "latest" \
+        -o | wc -l`
+
+    if [ ! -d $RES_FOLDER ]
+    then
+        return 0
+    fi
+
+    if [ -z "$n_success_res" ]
+    then
+        echo "FAILED" > $RES_FOLDER/$RES_PREFIX$curl_id
+        return 0
+    elif [ $n_success_res -lt 1 ]
+    then
+        echo "FAILED $n_success_res" > $RES_FOLDER/$RES_PREFIX$curl_id
+        echo "$curl_out" >> $RES_FOLDER/$RES_PREFIX$curl_id
+        return 0
+    fi
+    echo "OK" > $RES_FOLDER/$RES_PREFIX$curl_id
+}
+
+
 ## @fn dig_function()
 ## @brief runs dig function to query NS
 function dig_function() {
