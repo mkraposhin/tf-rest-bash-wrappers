@@ -32,3 +32,27 @@ These networks can be then deleted with the command:
 
     delete_networks "nwa,nwb"
 
+### Creation and deletion of a virtual port (virtual machine interface) with IP address
+
+As the first step, we create virtual network **nw1** and obtain it's
+subnet UUID:
+
+    create_network "nw1" "1111::/32"
+    local nw_subnet_uuid=`network_ipam_subnets "nw1"`
+
+Then we create a virtual machine interface **vmi1** in virtual network **nw1**:
+
+    create_vm_interface "vmi1" "nw1"
+
+Finally, we create in instance ip **iip1** with IPv6 address "1111::11" and
+associate it with **vmi1**:
+
+    create_instance_ip "iip1" "nw1" "$nw_subnet_uuid" "1111::11"
+    link_iip_with_vmi "iip1" "vmi1"
+
+The created entities should be deleted in the reversed order:
+    
+    delete_instance_ips "iip1"
+    delete_vm_interfaces "vmi1"
+    delete_networks "nw1"
+

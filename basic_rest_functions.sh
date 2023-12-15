@@ -655,14 +655,14 @@ REQ_MARKER
 ## Input: name, virtual-network fqname, subnet_uuid, ip address(optionally)
 function create_instance_ip(){
     local REQ_STR
-    local ipi_name="$1"
+    local iip_name="$1"
     local nw_name="$2"
     local subnet_uuid="$3"
     local ip_addr="$4"
 
-    if [ "$ipi_name" = "" ] || [ "$nw_name" = "" ] || [ "$subnet_uuid" = "" ]
+    if [ "$iip_name" = "" ] || [ "$nw_name" = "" ] || [ "$subnet_uuid" = "" ]
     then
-        echo "create_instance_ip error: ipi_name=$ipi_name, nw_name=$nw_name, subnet_uuid=$subnet_uuid" >> $MESG_LOG
+        echo "create_instance_ip error: iip_name=$iip_name, nw_name=$nw_name, subnet_uuid=$subnet_uuid" >> $MESG_LOG
         return 1;
     fi
 
@@ -678,7 +678,7 @@ function create_instance_ip(){
     {
         "instance-ip": {
             "parent_type": "config-root",
-            "fq_name": ["$ipi_name"],
+            "fq_name": ["$iip_name"],
             "virtual_network_refs" : [{"to" : $nw_fqname}],
             "subnet_uuid" : "$subnet_uuid",
             "instance_ip_mode": "active-active"
@@ -686,7 +686,7 @@ function create_instance_ip(){
         }
     }
 REQ_MARKER
-    echo "$REQ_STR" 1>&2
+
     local REQ_URL="$REST_ADDRESS/instance-ips"
     echo >> $MESG_LOG
     execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
