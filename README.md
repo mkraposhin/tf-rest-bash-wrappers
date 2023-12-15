@@ -44,8 +44,8 @@ Then we create a virtual machine interface **vmi1** in virtual network **nw1**:
 
     create_vm_interface "vmi1" "nw1"
 
-Finally, we create in instance ip **iip1** with IPv6 address "1111::11" and
-associate it with **vmi1**:
+Finally, we create in instance ip **iip1** with IPv6 address "1111::11" (
+from 1111::/32 subnet of **nw1** network) and associate it with **vmi1**:
 
     create_instance_ip "iip1" "nw1" "$nw_subnet_uuid" "1111::11"
     link_iip_with_vmi "iip1" "vmi1"
