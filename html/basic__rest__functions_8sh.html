@@ -142,7 +142,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a3f83b6a6b32a8c923dee482720272938"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates random IPv4 subnet prefix of a given length.  <a href="basic__rest__functions_8sh.html#a3f83b6a6b32a8c923dee482720272938">More...</a><br /></td></tr>
 <tr class="separator:a3f83b6a6b32a8c923dee482720272938"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f42dbb49c8cd17c7c48d810b645e3f0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#a3f42dbb49c8cd17c7c48d810b645e3f0">make_random_ipam_subnet_prefix_ipv6</a> ()</td></tr>
-<tr class="memdesc:a3f42dbb49c8cd17c7c48d810b645e3f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates random IPv6 subnet prefix of a given length.  <a href="basic__rest__functions_8sh.html#a3f42dbb49c8cd17c7c48d810b645e3f0">More...</a><br /></td></tr>
+<tr class="memdesc:a3f42dbb49c8cd17c7c48d810b645e3f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates random IPv6 subnet prefix of of length 24 (3 digits)  <a href="basic__rest__functions_8sh.html#a3f42dbb49c8cd17c7c48d810b645e3f0">More...</a><br /></td></tr>
 <tr class="separator:a3f42dbb49c8cd17c7c48d810b645e3f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a788c815f77f53750e8fdb0e9494345c0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#a788c815f77f53750e8fdb0e9494345c0">make_random_ipam_subnet_ipv6</a> ()</td></tr>
 <tr class="memdesc:a788c815f77f53750e8fdb0e9494345c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates JSON description of IPv6 subnet of length 16.  <a href="basic__rest__functions_8sh.html#a788c815f77f53750e8fdb0e9494345c0">More...</a><br /></td></tr>
@@ -217,9 +217,9 @@ Variables</h2></td></tr>
 <tr class="memitem:a5b41285ba8b2ca9452eb7e7e4e08af5c"><td class="memItemLeft" align="right" valign="top">String Array&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#a5b41285ba8b2ca9452eb7e7e4e08af5c">LAT_LETTERS</a></td></tr>
 <tr class="memdesc:a5b41285ba8b2ca9452eb7e7e4e08af5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ordered list of capital latin letters.  <a href="basic__rest__functions_8sh.html#a5b41285ba8b2ca9452eb7e7e4e08af5c">More...</a><br /></td></tr>
 <tr class="separator:a5b41285ba8b2ca9452eb7e7e4e08af5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b00ac53be402b910459c17b20aeec11"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#a4b00ac53be402b910459c17b20aeec11">CURL_LOG</a> = log</td></tr>
-<tr class="memdesc:a4b00ac53be402b910459c17b20aeec11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contains name of log file.  <a href="basic__rest__functions_8sh.html#a4b00ac53be402b910459c17b20aeec11">More...</a><br /></td></tr>
-<tr class="separator:a4b00ac53be402b910459c17b20aeec11"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adaf61c63e10eb58288850fb3d98237c7"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#adaf61c63e10eb58288850fb3d98237c7">MESG_LOG</a> = log</td></tr>
+<tr class="memdesc:adaf61c63e10eb58288850fb3d98237c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contains name of log file.  <a href="basic__rest__functions_8sh.html#adaf61c63e10eb58288850fb3d98237c7">More...</a><br /></td></tr>
+<tr class="separator:adaf61c63e10eb58288850fb3d98237c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8953505cdfb70bf649962db5dd2316ca"><td class="memItemLeft" align="right" valign="top">Exported String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#a8953505cdfb70bf649962db5dd2316ca">BASIC_REST_FUNCTIONS</a> =</td></tr>
 <tr class="memdesc:a8953505cdfb70bf649962db5dd2316ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">A guard variable to prevent recursive execution of <a class="el" href="basic__rest__functions_8sh.html" title="A set of functions to talk to the TF Agent REST server.">basic_rest_functions.sh</a>.  <a href="basic__rest__functions_8sh.html#a8953505cdfb70bf649962db5dd2316ca">More...</a><br /></td></tr>
 <tr class="separator:a8953505cdfb70bf649962db5dd2316ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -269,8 +269,8 @@ Variables</h2></td></tr>
 
 <p>Create BPG-as-a-Service. </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00835">835</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  835</span>{</div>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00841">841</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  841</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -291,8 +291,8 @@ Variables</h2></td></tr>
 
 <p>Creates a floating ip object @input: fip name, parent ipi name, fip ip address, fip direction. </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00709">709</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  709</span>{</div>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00715">715</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  715</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -313,8 +313,8 @@ Variables</h2></td></tr>
 
 <p>Creates an IP Instance Input: name, virtual-network fqname, subnet_uuid, ip address(optionally) </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00650">650</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  650</span>{</div>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00656">656</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  656</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -335,8 +335,8 @@ Variables</h2></td></tr>
 
 <p>Creates a new instance ip if an object with the given name is not found. </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00692">692</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  692</span>{</div>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00698">698</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  698</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -357,8 +357,8 @@ Variables</h2></td></tr>
 
 <p>Creates new interface routes table. </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00751">751</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  751</span>{</div>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00757">757</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  757</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -379,8 +379,8 @@ Variables</h2></td></tr>
 
 <p>Creates a new logical router. </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00893">893</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  893</span>{</div>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00899">899</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  899</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -401,8 +401,8 @@ Variables</h2></td></tr>
 
 <p>Creates a new network INPUT: name of network, number of subnets per network, version of the IP protocol. </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00594">594</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  594</span>{</div>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00600">600</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  600</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -423,8 +423,8 @@ Variables</h2></td></tr>
 
 <p>Creates a virtual machine interface Input: name, virtual-network name. </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00787">787</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  787</span>{</div>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00793">793</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  793</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -445,8 +445,8 @@ Variables</h2></td></tr>
 
 <p>Create vm interface if it is not present. </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00821">821</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  821</span>{</div>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00827">827</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  827</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -621,8 +621,8 @@ Variables</h2></td></tr>
 
 <p>Sets a new IP address for the given FIP. </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00559">559</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  559</span>{</div>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00565">565</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  565</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -862,7 +862,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Creates random IPv6 subnet prefix of a given length. </p>
+<p>Creates random IPv6 subnet prefix of of length 24 (3 digits) </p>
 
 <p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00284">284</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  284</span>{</div>
@@ -974,8 +974,8 @@ Variables</h2></td></tr>
 
 <p>Sets an IPAM for the network. </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00508">508</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  508</span>{</div>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00514">514</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  514</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1148,25 +1148,7 @@ Variables</h2></td></tr>
 
 <p>A guard variable to prevent recursive execution of <a class="el" href="basic__rest__functions_8sh.html" title="A set of functions to talk to the TF Agent REST server.">basic_rest_functions.sh</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l01774">1774</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-
-</div>
-</div>
-<a id="a4b00ac53be402b910459c17b20aeec11" name="a4b00ac53be402b910459c17b20aeec11"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b00ac53be402b910459c17b20aeec11">&#9670;&#160;</a></span>CURL_LOG</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">String CURL_LOG = log</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Contains name of log file. </p>
-
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00025">25</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l01790">1790</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
 
 </div>
 </div>
@@ -1203,6 +1185,24 @@ Variables</h2></td></tr>
 <p>Ordered list of capital latin letters. </p>
 
 <p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00022">22</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+
+</div>
+</div>
+<a id="adaf61c63e10eb58288850fb3d98237c7" name="adaf61c63e10eb58288850fb3d98237c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adaf61c63e10eb58288850fb3d98237c7">&#9670;&#160;</a></span>MESG_LOG</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">String MESG_LOG = log</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Contains name of log file. </p>
+
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00025">25</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
 
 </div>
 </div>

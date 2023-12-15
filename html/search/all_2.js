@@ -8,6 +8,5 @@ var searchData=
   ['create_5flogical_5frouter_5',['create_logical_router',['../basic__rest__functions_8sh.html#a71b91c799fbe239e6e2fbb77b8c89e14',1,'basic_rest_functions.sh']]],
   ['create_5fnetwork_6',['create_network',['../basic__rest__functions_8sh.html#ab364269257592d4b3f848d5870124c52',1,'basic_rest_functions.sh']]],
   ['create_5fvm_5finterface_7',['create_vm_interface',['../basic__rest__functions_8sh.html#ac4f458fbbde35f8e0bbfa97b5348f0cc',1,'basic_rest_functions.sh']]],
-  ['create_5fvm_5finterface_5fifnp_8',['create_vm_interface_ifnp',['../basic__rest__functions_8sh.html#a7e9c0ad850e751ee6ff20379a10bee23',1,'basic_rest_functions.sh']]],
-  ['curl_5flog_9',['CURL_LOG',['../basic__rest__functions_8sh.html#a4b00ac53be402b910459c17b20aeec11',1,'basic_rest_functions.sh']]]
+  ['create_5fvm_5finterface_5fifnp_8',['create_vm_interface_ifnp',['../basic__rest__functions_8sh.html#a7e9c0ad850e751ee6ff20379a10bee23',1,'basic_rest_functions.sh']]]
 ];
