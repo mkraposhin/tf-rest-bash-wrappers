@@ -22,9 +22,11 @@ This network can be deleted with:
 
 First we create networka **nwa** and **nwb** with subnets aaaa::/32
 bbbb::/32:
+
     create_network "nwa" "aaaa::/32"
     create_network "nwb" "bbbb::/32"
 
-These networks can be then deleted with command:
+These networks can be then deleted with the command:
+
     delete_networks "nwa,nwb"
 
