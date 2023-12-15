@@ -13,18 +13,22 @@ a TF configuation is needed.
 ### Creation and deleteion of a virtual network
 
 First we create a network **nw1** with 1 subnet aaaa::/32:
+
     create_network "nw1" "aaaa::/32"
 
 This network can be deleted with:
+
     delete_networks "nw1"
 
 ### Creation and deletion of several virtual networks
 
 First we create networka **nwa** and **nwb** with subnets aaaa::/32
 bbbb::/32:
+
     create_network "nwa" "aaaa::/32"
     create_network "nwb" "bbbb::/32"
 
-These networks can be then deleted with command:
+These networks can be then deleted with the command:
+
     delete_networks "nwa,nwb"
 
