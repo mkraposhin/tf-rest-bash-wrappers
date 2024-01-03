@@ -1596,278 +1596,276 @@ $(function() {
 <div class="line"><a id="l01521" name="l01521"></a><span class="lineno"> 1521</span>    local REQ_URL=<span class="stringliteral">&quot;$REST_ADDRESS/global-vrouter-config/$gvr_uuid&quot;</span></div>
 <div class="line"><a id="l01522" name="l01522"></a><span class="lineno"> 1522</span>    REQ_STR=`echo $REQ_STR`</div>
 <div class="line"><a id="l01523" name="l01523"></a><span class="lineno"> 1523</span>    echo &gt;&gt; $MESG_LOG</div>
-<div class="line"><a id="l01524" name="l01524"></a><span class="lineno"> 1524</span>    echo $REQ_STR</div>
-<div class="line"><a id="l01525" name="l01525"></a><span class="lineno"> 1525</span>    <a class="code hl_function" href="basic__rest__functions_8sh.html#a631fef5fa7ed05781e35b6027050d48b">execute_put_request</a> <span class="stringliteral">&quot;$REQ_STR&quot;</span> <span class="stringliteral">&quot;$REQ_URL&quot;</span> &gt;&gt; $MESG_LOG</div>
-<div class="line"><a id="l01526" name="l01526"></a><span class="lineno"> 1526</span>}</div>
-<div class="line"><a id="l01527" name="l01527"></a><span class="lineno"> 1527</span> </div>
-<div class="line"><a id="l01528" name="l01528"></a><span class="lineno"> 1528</span>function get_ll_service_config() {</div>
-<div class="line"><a id="l01529" name="l01529"></a><span class="lineno"> 1529</span>    local ll_services=<span class="stringliteral">&quot;$1&quot;</span></div>
-<div class="line"><a id="l01530" name="l01530"></a><span class="lineno"> 1530</span>    local ll_service_name=<span class="stringliteral">&quot;$2&quot;</span></div>
-<div class="line"><a id="l01531" name="l01531"></a><span class="lineno"> 1531</span>    local n_ll_services=`jq -c -r <span class="stringliteral">&#39;. | length&#39;</span> &lt;&lt;&lt; <span class="stringliteral">&quot;$ll_services&quot;</span>`</div>
-<div class="line"><a id="l01532" name="l01532"></a><span class="lineno"> 1532</span>    local i_service=0</div>
-<div class="line"><a id="l01533" name="l01533"></a><span class="lineno"> 1533</span>    </div>
-<div class="line"><a id="l01534" name="l01534"></a><span class="lineno"> 1534</span>    local ll_config=</div>
-<div class="line"><a id="l01535" name="l01535"></a><span class="lineno"> 1535</span>    local ll_name=</div>
-<div class="line"><a id="l01536" name="l01536"></a><span class="lineno"> 1536</span>    <span class="keywordflow">while</span> [ $i_service -lt $n_ll_services ]</div>
-<div class="line"><a id="l01537" name="l01537"></a><span class="lineno"> 1537</span>    <span class="keywordflow">do</span></div>
-<div class="line"><a id="l01538" name="l01538"></a><span class="lineno"> 1538</span>        ll_config=`jq -c -r <span class="stringliteral">&quot;.[$i_service]&quot;</span> &lt;&lt;&lt; <span class="stringliteral">&quot;$ll_services&quot;</span>`</div>
-<div class="line"><a id="l01539" name="l01539"></a><span class="lineno"> 1539</span>        ll_name=`jq -c -r <span class="stringliteral">&quot;.linklocal_service_name&quot;</span> &lt;&lt;&lt; <span class="stringliteral">&quot;$ll_config&quot;</span>`</div>
-<div class="line"><a id="l01540" name="l01540"></a><span class="lineno"> 1540</span>        <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$ll_name&quot;</span> = <span class="stringliteral">&quot;$ll_service_name&quot;</span> ]</div>
-<div class="line"><a id="l01541" name="l01541"></a><span class="lineno"> 1541</span>        then</div>
-<div class="line"><a id="l01542" name="l01542"></a><span class="lineno"> 1542</span>            <span class="keywordflow">break</span></div>
-<div class="line"><a id="l01543" name="l01543"></a><span class="lineno"> 1543</span>        fi</div>
-<div class="line"><a id="l01544" name="l01544"></a><span class="lineno"> 1544</span>        i_service=`expr $i_service + 1`</div>
-<div class="line"><a id="l01545" name="l01545"></a><span class="lineno"> 1545</span>    done</div>
-<div class="line"><a id="l01546" name="l01546"></a><span class="lineno"> 1546</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$ll_name&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
-<div class="line"><a id="l01547" name="l01547"></a><span class="lineno"> 1547</span>    then</div>
-<div class="line"><a id="l01548" name="l01548"></a><span class="lineno"> 1548</span>        echo $ll_config</div>
-<div class="line"><a id="l01549" name="l01549"></a><span class="lineno"> 1549</span>        <span class="keywordflow">return</span> 0</div>
-<div class="line"><a id="l01550" name="l01550"></a><span class="lineno"> 1550</span>    fi</div>
-<div class="line"><a id="l01551" name="l01551"></a><span class="lineno"> 1551</span>    echo <span class="stringliteral">&quot;Link local service was not found&quot;</span></div>
-<div class="line"><a id="l01552" name="l01552"></a><span class="lineno"> 1552</span>    <span class="keywordflow">return</span> 1</div>
-<div class="line"><a id="l01553" name="l01553"></a><span class="lineno"> 1553</span>}</div>
-<div class="line"><a id="l01554" name="l01554"></a><span class="lineno"> 1554</span> </div>
-<div class="line"><a id="l01555" name="l01555"></a><span class="lineno"> 1555</span>function del_ll_service() {</div>
-<div class="line"><a id="l01556" name="l01556"></a><span class="lineno"> 1556</span>    local gvr_fqname=<span class="stringliteral">&quot;$1&quot;</span></div>
-<div class="line"><a id="l01557" name="l01557"></a><span class="lineno"> 1557</span>    local ll_service_name=<span class="stringliteral">&quot;$2&quot;</span></div>
-<div class="line"><a id="l01558" name="l01558"></a><span class="lineno"> 1558</span>    local ll_services_config=`get_ll_services <span class="stringliteral">&quot;$gvr_fqname&quot;</span>`</div>
-<div class="line"><a id="l01559" name="l01559"></a><span class="lineno"> 1559</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$ll_services_config&quot;</span> = <span class="stringliteral">&quot;&quot;</span> ]</div>
-<div class="line"><a id="l01560" name="l01560"></a><span class="lineno"> 1560</span>    then</div>
-<div class="line"><a id="l01561" name="l01561"></a><span class="lineno"> 1561</span>        echo <span class="stringliteral">&quot;Cant retrieve link local services&quot;</span></div>
-<div class="line"><a id="l01562" name="l01562"></a><span class="lineno"> 1562</span>        <span class="keywordflow">return</span> 1</div>
-<div class="line"><a id="l01563" name="l01563"></a><span class="lineno"> 1563</span>    fi</div>
-<div class="line"><a id="l01564" name="l01564"></a><span class="lineno"> 1564</span><span class="preprocessor">    #</span></div>
-<div class="line"><a id="l01565" name="l01565"></a><span class="lineno"> 1565</span>    local gvr_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$gvr_fqname&quot;</span> <span class="stringliteral">&quot;global-vrouter-config&quot;</span>`</div>
-<div class="line"><a id="l01566" name="l01566"></a><span class="lineno"> 1566</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$gvr_uuid&quot;</span> = <span class="stringliteral">&quot;&quot;</span> ]</div>
-<div class="line"><a id="l01567" name="l01567"></a><span class="lineno"> 1567</span>    then</div>
-<div class="line"><a id="l01568" name="l01568"></a><span class="lineno"> 1568</span>        echo <span class="stringliteral">&quot;UUID for $gvr_fqname was not found&quot;</span></div>
-<div class="line"><a id="l01569" name="l01569"></a><span class="lineno"> 1569</span>        <span class="keywordflow">return</span> 1</div>
-<div class="line"><a id="l01570" name="l01570"></a><span class="lineno"> 1570</span>    fi</div>
-<div class="line"><a id="l01571" name="l01571"></a><span class="lineno"> 1571</span>    local n_services=`jq -c -r <span class="stringliteral">&#39;. | length&#39;</span> &lt;&lt;&lt; <span class="stringliteral">&quot;$ll_services_config&quot;</span>`</div>
-<div class="line"><a id="l01572" name="l01572"></a><span class="lineno"> 1572</span>    local i_service=0</div>
-<div class="line"><a id="l01573" name="l01573"></a><span class="lineno"> 1573</span>    local ll_config=</div>
-<div class="line"><a id="l01574" name="l01574"></a><span class="lineno"> 1574</span>    local ll_name=</div>
-<div class="line"><a id="l01575" name="l01575"></a><span class="lineno"> 1575</span>    local new_ll_config=</div>
-<div class="line"><a id="l01576" name="l01576"></a><span class="lineno"> 1576</span>    <span class="keywordflow">while</span> [ $i_service -lt $n_services ]</div>
-<div class="line"><a id="l01577" name="l01577"></a><span class="lineno"> 1577</span>    <span class="keywordflow">do</span></div>
-<div class="line"><a id="l01578" name="l01578"></a><span class="lineno"> 1578</span>        ll_config=`jq -c -r <span class="stringliteral">&quot;.[$i_service]&quot;</span> &lt;&lt;&lt; <span class="stringliteral">&quot;$ll_services_config&quot;</span>`</div>
-<div class="line"><a id="l01579" name="l01579"></a><span class="lineno"> 1579</span>        ll_name=`jq -c -r <span class="stringliteral">&quot;.linklocal_service_name&quot;</span> &lt;&lt;&lt; <span class="stringliteral">&quot;$ll_config&quot;</span>`</div>
-<div class="line"><a id="l01580" name="l01580"></a><span class="lineno"> 1580</span><span class="preprocessor">        # echo &quot;ll_config=$ll_config&quot;</span></div>
-<div class="line"><a id="l01581" name="l01581"></a><span class="lineno"> 1581</span>        <span class="keywordflow">if</span> [ ! <span class="stringliteral">&quot;$ll_name&quot;</span> = <span class="stringliteral">&quot;$ll_service_name&quot;</span> ]</div>
-<div class="line"><a id="l01582" name="l01582"></a><span class="lineno"> 1582</span>        then</div>
-<div class="line"><a id="l01583" name="l01583"></a><span class="lineno"> 1583</span>            new_ll_config=<span class="stringliteral">&quot;$ll_config,$new_ll_config&quot;</span></div>
-<div class="line"><a id="l01584" name="l01584"></a><span class="lineno"> 1584</span>        fi</div>
-<div class="line"><a id="l01585" name="l01585"></a><span class="lineno"> 1585</span>        i_service=`expr $i_service + 1`</div>
-<div class="line"><a id="l01586" name="l01586"></a><span class="lineno"> 1586</span>    done</div>
-<div class="line"><a id="l01587" name="l01587"></a><span class="lineno"> 1587</span>    new_ll_config=${new_ll_config::-1} #remove last <span class="stringliteral">&quot;,&quot;</span></div>
-<div class="line"><a id="l01588" name="l01588"></a><span class="lineno"> 1588</span>    new_ll_config=<span class="stringliteral">&quot;[$new_ll_config]&quot;</span></div>
-<div class="line"><a id="l01589" name="l01589"></a><span class="lineno"> 1589</span> </div>
-<div class="line"><a id="l01590" name="l01590"></a><span class="lineno"> 1590</span>    local REQ_STR=</div>
-<div class="line"><a id="l01591" name="l01591"></a><span class="lineno"> 1591</span>    read -r -d <span class="stringliteral">&#39;&#39;</span> REQ_STR &lt;&lt;- REQ_MARKER</div>
-<div class="line"><a id="l01592" name="l01592"></a><span class="lineno"> 1592</span>    {</div>
-<div class="line"><a id="l01593" name="l01593"></a><span class="lineno"> 1593</span>        <span class="stringliteral">&quot;global-vrouter-config&quot;</span>:</div>
-<div class="line"><a id="l01594" name="l01594"></a><span class="lineno"> 1594</span>        {</div>
-<div class="line"><a id="l01595" name="l01595"></a><span class="lineno"> 1595</span>            <span class="stringliteral">&quot;linklocal_services&quot;</span>:</div>
-<div class="line"><a id="l01596" name="l01596"></a><span class="lineno"> 1596</span>            {</div>
-<div class="line"><a id="l01597" name="l01597"></a><span class="lineno"> 1597</span>                <span class="stringliteral">&quot;linklocal_service_entry&quot;</span>:$new_ll_config</div>
-<div class="line"><a id="l01598" name="l01598"></a><span class="lineno"> 1598</span>            }</div>
-<div class="line"><a id="l01599" name="l01599"></a><span class="lineno"> 1599</span>        }</div>
-<div class="line"><a id="l01600" name="l01600"></a><span class="lineno"> 1600</span>    }</div>
-<div class="line"><a id="l01601" name="l01601"></a><span class="lineno"> 1601</span>REQ_MARKER</div>
-<div class="line"><a id="l01602" name="l01602"></a><span class="lineno"> 1602</span>    local REQ_URL=<span class="stringliteral">&quot;$REST_ADDRESS/global-vrouter-config/$gvr_uuid&quot;</span></div>
-<div class="line"><a id="l01603" name="l01603"></a><span class="lineno"> 1603</span>    REQ_STR=`echo $REQ_STR`</div>
-<div class="line"><a id="l01604" name="l01604"></a><span class="lineno"> 1604</span>    echo &gt;&gt; $MESG_LOG</div>
-<div class="line"><a id="l01605" name="l01605"></a><span class="lineno"> 1605</span>    echo $REQ_STR</div>
-<div class="line"><a id="l01606" name="l01606"></a><span class="lineno"> 1606</span>    <a class="code hl_function" href="basic__rest__functions_8sh.html#a631fef5fa7ed05781e35b6027050d48b">execute_put_request</a> <span class="stringliteral">&quot;$REQ_STR&quot;</span> <span class="stringliteral">&quot;$REQ_URL&quot;</span> &gt;&gt; $MESG_LOG</div>
-<div class="line"><a id="l01607" name="l01607"></a><span class="lineno"> 1607</span>}</div>
-<div class="line"><a id="l01608" name="l01608"></a><span class="lineno"> 1608</span> </div>
-<div class="line"><a id="l01609" name="l01609"></a><span class="lineno"> 1609</span>function delete_floating_ips() {</div>
-<div class="line"><a id="l01610" name="l01610"></a><span class="lineno"> 1610</span>    local iip_fips=<span class="stringliteral">&quot;$1&quot;</span></div>
-<div class="line"><a id="l01611" name="l01611"></a><span class="lineno"> 1611</span> </div>
-<div class="line"><a id="l01612" name="l01612"></a><span class="lineno"> 1612</span>    local iip_name=</div>
-<div class="line"><a id="l01613" name="l01613"></a><span class="lineno"> 1613</span>    local fip_name=</div>
-<div class="line"><a id="l01614" name="l01614"></a><span class="lineno"> 1614</span>    local fip_pos=</div>
-<div class="line"><a id="l01615" name="l01615"></a><span class="lineno"> 1615</span>    local fip_fqname=</div>
-<div class="line"><a id="l01616" name="l01616"></a><span class="lineno"> 1616</span>    local fip_uuid=</div>
-<div class="line"><a id="l01617" name="l01617"></a><span class="lineno"> 1617</span>    <span class="keywordflow">for</span> iip_fip in $iip_fips</div>
-<div class="line"><a id="l01618" name="l01618"></a><span class="lineno"> 1618</span>    <span class="keywordflow">do</span></div>
-<div class="line"><a id="l01619" name="l01619"></a><span class="lineno"> 1619</span> </div>
-<div class="line"><a id="l01620" name="l01620"></a><span class="lineno"> 1620</span>        fip_name=${iip_fip#*<span class="stringliteral">&quot;,&quot;</span>}</div>
-<div class="line"><a id="l01621" name="l01621"></a><span class="lineno"> 1621</span>        fip_pos=$(( ${#iip_fip} - ${#fip_name} - 1 ))</div>
-<div class="line"><a id="l01622" name="l01622"></a><span class="lineno"> 1622</span>        iip_name=<span class="stringliteral">&quot;${iip_fip:0:$fip_pos}&quot;</span></div>
-<div class="line"><a id="l01623" name="l01623"></a><span class="lineno"> 1623</span> </div>
-<div class="line"><a id="l01624" name="l01624"></a><span class="lineno"> 1624</span>        fip_fqname=<span class="stringliteral">&quot;[\&quot;$iip_name\&quot;, \&quot;$fip_name\&quot;]&quot;</span></div>
-<div class="line"><a id="l01625" name="l01625"></a><span class="lineno"> 1625</span>        fip_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$fip_fqname&quot;</span> <span class="stringliteral">&quot;floating-ip&quot;</span>`</div>
-<div class="line"><a id="l01626" name="l01626"></a><span class="lineno"> 1626</span>        <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$fip_uuid&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
-<div class="line"><a id="l01627" name="l01627"></a><span class="lineno"> 1627</span>        then</div>
-<div class="line"><a id="l01628" name="l01628"></a><span class="lineno"> 1628</span>            <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$fip_uuid&quot;</span> <span class="stringliteral">&quot;floating-ip&quot;</span></div>
-<div class="line"><a id="l01629" name="l01629"></a><span class="lineno"> 1629</span>        fi</div>
-<div class="line"><a id="l01630" name="l01630"></a><span class="lineno"> 1630</span>    done</div>
-<div class="line"><a id="l01631" name="l01631"></a><span class="lineno"> 1631</span>}</div>
-<div class="line"><a id="l01632" name="l01632"></a><span class="lineno"> 1632</span> </div>
-<div class="line"><a id="l01633" name="l01633"></a><span class="lineno"> 1633</span>function delete_instance_ips(){</div>
-<div class="line"><a id="l01634" name="l01634"></a><span class="lineno"> 1634</span>    local ipis=$1</div>
-<div class="line"><a id="l01635" name="l01635"></a><span class="lineno"> 1635</span>    <span class="keywordflow">for</span> ipi in $ipis</div>
-<div class="line"><a id="l01636" name="l01636"></a><span class="lineno"> 1636</span>    <span class="keywordflow">do</span></div>
-<div class="line"><a id="l01637" name="l01637"></a><span class="lineno"> 1637</span>        local ipi_fqname=<span class="stringliteral">&quot;[\&quot;$ipi\&quot;]&quot;</span></div>
-<div class="line"><a id="l01638" name="l01638"></a><span class="lineno"> 1638</span>        echo <span class="stringliteral">&quot;Deleting $ipi_fqname&quot;</span> &gt;&gt; $MESG_LOG</div>
-<div class="line"><a id="l01639" name="l01639"></a><span class="lineno"> 1639</span>        local ipi_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$ipi_fqname&quot;</span> <span class="stringliteral">&quot;instance-ip&quot;</span>`</div>
-<div class="line"><a id="l01640" name="l01640"></a><span class="lineno"> 1640</span>        <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$ipi_uuid&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
-<div class="line"><a id="l01641" name="l01641"></a><span class="lineno"> 1641</span>        then</div>
-<div class="line"><a id="l01642" name="l01642"></a><span class="lineno"> 1642</span>            <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$ipi_uuid&quot;</span> <span class="stringliteral">&quot;instance-ip&quot;</span></div>
-<div class="line"><a id="l01643" name="l01643"></a><span class="lineno"> 1643</span>        fi</div>
-<div class="line"><a id="l01644" name="l01644"></a><span class="lineno"> 1644</span>    done</div>
-<div class="line"><a id="l01645" name="l01645"></a><span class="lineno"> 1645</span>}</div>
-<div class="line"><a id="l01646" name="l01646"></a><span class="lineno"> 1646</span> </div>
-<div class="line"><a id="l01647" name="l01647"></a><span class="lineno"> 1647</span>function delete_vm_interfaces(){</div>
-<div class="line"><a id="l01648" name="l01648"></a><span class="lineno"> 1648</span>    local vmis=$1</div>
-<div class="line"><a id="l01649" name="l01649"></a><span class="lineno"> 1649</span>    <span class="keywordflow">for</span> vmi in $vmis</div>
-<div class="line"><a id="l01650" name="l01650"></a><span class="lineno"> 1650</span>    <span class="keywordflow">do</span></div>
-<div class="line"><a id="l01651" name="l01651"></a><span class="lineno"> 1651</span>        local vmi_fqname=`<a class="code hl_function" href="basic__rest__functions_8sh.html#aa0373715af0257cdfc05aa9d30d6439e">name_to_fqname</a> $vmi`</div>
-<div class="line"><a id="l01652" name="l01652"></a><span class="lineno"> 1652</span>        echo <span class="stringliteral">&quot;Deleting $vmi_fqname&quot;</span> &gt;&gt; $MESG_LOG</div>
-<div class="line"><a id="l01653" name="l01653"></a><span class="lineno"> 1653</span>        local vmi_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$vmi_fqname&quot;</span> <span class="stringliteral">&quot;virtual-machine-interface&quot;</span>`</div>
-<div class="line"><a id="l01654" name="l01654"></a><span class="lineno"> 1654</span>        <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$vmi_uuid&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
-<div class="line"><a id="l01655" name="l01655"></a><span class="lineno"> 1655</span>        then</div>
-<div class="line"><a id="l01656" name="l01656"></a><span class="lineno"> 1656</span>            <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$vmi_uuid&quot;</span> <span class="stringliteral">&quot;virtual-machine-interface&quot;</span></div>
-<div class="line"><a id="l01657" name="l01657"></a><span class="lineno"> 1657</span>        fi</div>
-<div class="line"><a id="l01658" name="l01658"></a><span class="lineno"> 1658</span>    done</div>
-<div class="line"><a id="l01659" name="l01659"></a><span class="lineno"> 1659</span>}</div>
-<div class="line"><a id="l01660" name="l01660"></a><span class="lineno"> 1660</span> </div>
-<div class="line"><a id="l01661" name="l01661"></a><span class="lineno"> 1661</span>function delete_bgpaases(){</div>
-<div class="line"><a id="l01662" name="l01662"></a><span class="lineno"> 1662</span>    local bgps=$1</div>
-<div class="line"><a id="l01663" name="l01663"></a><span class="lineno"> 1663</span>    <span class="keywordflow">for</span> bgpaas in $bgps</div>
-<div class="line"><a id="l01664" name="l01664"></a><span class="lineno"> 1664</span>    <span class="keywordflow">do</span></div>
-<div class="line"><a id="l01665" name="l01665"></a><span class="lineno"> 1665</span>        local bgpaas_fqname=`<a class="code hl_function" href="basic__rest__functions_8sh.html#aa0373715af0257cdfc05aa9d30d6439e">name_to_fqname</a> $bgpaas`</div>
-<div class="line"><a id="l01666" name="l01666"></a><span class="lineno"> 1666</span>        echo <span class="stringliteral">&quot;Deleting $bgpaas_fqname&quot;</span> &gt;&gt; $MESG_LOG</div>
-<div class="line"><a id="l01667" name="l01667"></a><span class="lineno"> 1667</span>        local bgpaas_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$bgpaas_fqname&quot;</span> <span class="stringliteral">&quot;bgp-as-a-service&quot;</span>`</div>
-<div class="line"><a id="l01668" name="l01668"></a><span class="lineno"> 1668</span>        <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$bgpaas_uuid&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
-<div class="line"><a id="l01669" name="l01669"></a><span class="lineno"> 1669</span>        then</div>
-<div class="line"><a id="l01670" name="l01670"></a><span class="lineno"> 1670</span>            <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$bgpaas_uuid&quot;</span> <span class="stringliteral">&quot;bgp-as-a-service&quot;</span></div>
-<div class="line"><a id="l01671" name="l01671"></a><span class="lineno"> 1671</span>        fi</div>
-<div class="line"><a id="l01672" name="l01672"></a><span class="lineno"> 1672</span>    done</div>
-<div class="line"><a id="l01673" name="l01673"></a><span class="lineno"> 1673</span>}</div>
-<div class="line"><a id="l01674" name="l01674"></a><span class="lineno"> 1674</span> </div>
-<div class="line"><a id="l01675" name="l01675"></a><span class="lineno"> 1675</span>function delete_networks(){</div>
-<div class="line"><a id="l01676" name="l01676"></a><span class="lineno"> 1676</span>    local networks=<span class="stringliteral">&quot;$1&quot;</span></div>
-<div class="line"><a id="l01677" name="l01677"></a><span class="lineno"> 1677</span>    <span class="keywordflow">for</span> nw in $networks</div>
-<div class="line"><a id="l01678" name="l01678"></a><span class="lineno"> 1678</span>    <span class="keywordflow">do</span></div>
-<div class="line"><a id="l01679" name="l01679"></a><span class="lineno"> 1679</span>        echo <span class="stringliteral">&quot;Deleting nw $nw&quot;</span> &gt;&gt; $MESG_LOG</div>
-<div class="line"><a id="l01680" name="l01680"></a><span class="lineno"> 1680</span>        nw_fqname=`<a class="code hl_function" href="basic__rest__functions_8sh.html#aa0373715af0257cdfc05aa9d30d6439e">name_to_fqname</a> $nw`</div>
-<div class="line"><a id="l01681" name="l01681"></a><span class="lineno"> 1681</span>        nw_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$nw_fqname&quot;</span> <span class="stringliteral">&quot;virtual-network&quot;</span>`</div>
-<div class="line"><a id="l01682" name="l01682"></a><span class="lineno"> 1682</span>        <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$nw_uuid&quot;</span> <span class="stringliteral">&quot;virtual-network&quot;</span></div>
-<div class="line"><a id="l01683" name="l01683"></a><span class="lineno"> 1683</span>    done</div>
-<div class="line"><a id="l01684" name="l01684"></a><span class="lineno"> 1684</span>}</div>
-<div class="line"><a id="l01685" name="l01685"></a><span class="lineno"> 1685</span> </div>
-<div class="line"><a id="l01686" name="l01686"></a><span class="lineno"> 1686</span><span class="preprocessor"># @fn prefix_delete_vm_interfaces</span></div>
-<div class="line"><a id="l01687" name="l01687"></a><span class="lineno"> 1687</span><span class="preprocessor"># @brief This deletes all vmi&#39;s with a given prefix</span></div>
-<div class="line"><a id="l01688" name="l01688"></a><span class="lineno"> 1688</span>function prefix_delete_vm_interfaces(){</div>
-<div class="line"><a id="l01689" name="l01689"></a><span class="lineno"> 1689</span>    local vm_prefix=$1</div>
-<div class="line"><a id="l01690" name="l01690"></a><span class="lineno"> 1690</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$vm_prefix&quot;</span> = <span class="stringliteral">&quot;&quot;</span> ]</div>
-<div class="line"><a id="l01691" name="l01691"></a><span class="lineno"> 1691</span>    then</div>
-<div class="line"><a id="l01692" name="l01692"></a><span class="lineno"> 1692</span>        <span class="keywordflow">return</span> 1</div>
-<div class="line"><a id="l01693" name="l01693"></a><span class="lineno"> 1693</span>    fi</div>
-<div class="line"><a id="l01694" name="l01694"></a><span class="lineno"> 1694</span>    local myvmis=`curl $REST_ADDRESS/<span class="keyword">virtual</span>-machine-interfaces\</div>
-<div class="line"><a id="l01695" name="l01695"></a><span class="lineno"> 1695</span>        | python3 -m json.tool | grep <span class="stringliteral">&quot;$vm_prefix&quot;</span>`</div>
-<div class="line"><a id="l01696" name="l01696"></a><span class="lineno"> 1696</span>    local vmis_stripped=<span class="stringliteral">&quot;&quot;</span></div>
-<div class="line"><a id="l01697" name="l01697"></a><span class="lineno"> 1697</span>    <span class="keywordflow">for</span> vmi in $myvmis</div>
-<div class="line"><a id="l01698" name="l01698"></a><span class="lineno"> 1698</span>    <span class="keywordflow">do</span></div>
-<div class="line"><a id="l01699" name="l01699"></a><span class="lineno"> 1699</span>        local tmp=${vmi#*\<span class="stringliteral">&quot;}</span></div>
-<div class="line"><a id="l01700" name="l01700"></a><span class="lineno"> 1700</span><span class="stringliteral">        local v=${tmp%\&quot;*}</span></div>
-<div class="line"><a id="l01701" name="l01701"></a><span class="lineno"> 1701</span><span class="stringliteral">        vmis_stripped=&quot;</span>$v $vmis_stripped<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01702" name="l01702"></a><span class="lineno"> 1702</span><span class="stringliteral">    done</span></div>
-<div class="line"><a id="l01703" name="l01703"></a><span class="lineno"> 1703</span><span class="stringliteral">    delete_vm_interfaces &quot;</span>$vmis_stripped<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01704" name="l01704"></a><span class="lineno"> 1704</span><span class="stringliteral">}</span></div>
-<div class="line"><a id="l01705" name="l01705"></a><span class="lineno"> 1705</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l01706" name="l01706"></a><span class="lineno"> 1706</span><span class="stringliteral"># @fn prefix_delete_ip_instances</span></div>
-<div class="line"><a id="l01707" name="l01707"></a><span class="lineno"> 1707</span><span class="stringliteral"># @brief This deletes all IP instances with a given prefix</span></div>
-<div class="line"><a id="l01708" name="l01708"></a><span class="lineno"> 1708</span><span class="stringliteral">function prefix_delete_ip_instances(){</span></div>
-<div class="line"><a id="l01709" name="l01709"></a><span class="lineno"> 1709</span><span class="stringliteral">    local ipi_prefix=$1</span></div>
-<div class="line"><a id="l01710" name="l01710"></a><span class="lineno"> 1710</span><span class="stringliteral">    if [ &quot;</span>$ipi_prefix<span class="stringliteral">&quot; = &quot;</span><span class="stringliteral">&quot; ]</span></div>
-<div class="line"><a id="l01711" name="l01711"></a><span class="lineno"> 1711</span><span class="stringliteral">    then</span></div>
-<div class="line"><a id="l01712" name="l01712"></a><span class="lineno"> 1712</span><span class="stringliteral">        return 1</span></div>
-<div class="line"><a id="l01713" name="l01713"></a><span class="lineno"> 1713</span><span class="stringliteral">    fi</span></div>
-<div class="line"><a id="l01714" name="l01714"></a><span class="lineno"> 1714</span><span class="stringliteral">    local myipis=`curl $REST_ADDRESS/instance-ips\</span></div>
-<div class="line"><a id="l01715" name="l01715"></a><span class="lineno"> 1715</span><span class="stringliteral">        | python3 -m json.tool | grep &quot;</span>$ipi_prefix<span class="stringliteral">&quot;`</span></div>
-<div class="line"><a id="l01716" name="l01716"></a><span class="lineno"> 1716</span><span class="stringliteral">    local ipis_stripped=&quot;</span><span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01717" name="l01717"></a><span class="lineno"> 1717</span><span class="stringliteral">    for ipi in $myipis</span></div>
-<div class="line"><a id="l01718" name="l01718"></a><span class="lineno"> 1718</span><span class="stringliteral">    do</span></div>
-<div class="line"><a id="l01719" name="l01719"></a><span class="lineno"> 1719</span><span class="stringliteral">        local tmp=${ipi#*\&quot;}</span></div>
-<div class="line"><a id="l01720" name="l01720"></a><span class="lineno"> 1720</span><span class="stringliteral">        local i=${tmp%\&quot;*}</span></div>
-<div class="line"><a id="l01721" name="l01721"></a><span class="lineno"> 1721</span><span class="stringliteral">        ipis_stripped=&quot;</span>$i $ipis_stripped<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01722" name="l01722"></a><span class="lineno"> 1722</span><span class="stringliteral">    done</span></div>
-<div class="line"><a id="l01723" name="l01723"></a><span class="lineno"> 1723</span><span class="stringliteral">    delete_instance_ips &quot;</span>$ipis_stripped<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01724" name="l01724"></a><span class="lineno"> 1724</span><span class="stringliteral">}</span></div>
-<div class="line"><a id="l01725" name="l01725"></a><span class="lineno"> 1725</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l01726" name="l01726"></a><span class="lineno"> 1726</span><span class="stringliteral">function delete_logical_router() {</span></div>
-<div class="line"><a id="l01727" name="l01727"></a><span class="lineno"> 1727</span><span class="stringliteral">    local lr_name=&quot;</span>$1<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01728" name="l01728"></a><span class="lineno"> 1728</span><span class="stringliteral">    local nw_names=&quot;</span>$2<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01729" name="l01729"></a><span class="lineno"> 1729</span><span class="stringliteral">    local lr_fqname=`name_to_fqname $lr_name`</span></div>
-<div class="line"><a id="l01730" name="l01730"></a><span class="lineno"> 1730</span><span class="stringliteral">    local lr_uuid=`fqname_to_uuid &quot;</span>$lr_fqname<span class="stringliteral">&quot; &quot;</span>logical-router<span class="stringliteral">&quot;`</span></div>
-<div class="line"><a id="l01731" name="l01731"></a><span class="lineno"> 1731</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l01732" name="l01732"></a><span class="lineno"> 1732</span><span class="stringliteral">    for nw_name in $nw_names</span></div>
-<div class="line"><a id="l01733" name="l01733"></a><span class="lineno"> 1733</span><span class="stringliteral">    do</span></div>
-<div class="line"><a id="l01734" name="l01734"></a><span class="lineno"> 1734</span><span class="stringliteral">        local vmi_lrname=&quot;</span>vmi-lr-<span class="stringliteral">&quot;&quot;</span>$lr_name<span class="stringliteral">&quot;-&quot;</span>$nw_name<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01735" name="l01735"></a><span class="lineno"> 1735</span><span class="stringliteral">        local ipi_lrname=&quot;</span>ipi-lr-<span class="stringliteral">&quot;&quot;</span>$lr_name<span class="stringliteral">&quot;-&quot;</span>$nw_name<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01736" name="l01736"></a><span class="lineno"> 1736</span><span class="stringliteral">        local vmi_fqname=`name_to_fqname $vmi_lrname`</span></div>
-<div class="line"><a id="l01737" name="l01737"></a><span class="lineno"> 1737</span><span class="stringliteral">        local ipi_fqname=`name_to_fqname $ipi_lrname`</span></div>
-<div class="line"><a id="l01738" name="l01738"></a><span class="lineno"> 1738</span><span class="stringliteral">        local vmi_uuid=`fqname_to_uuid &quot;</span>$vmi_fqname<span class="stringliteral">&quot; &quot;</span><span class="keyword">virtual</span>-machine-interface<span class="stringliteral">&quot;`</span></div>
-<div class="line"><a id="l01739" name="l01739"></a><span class="lineno"> 1739</span><span class="stringliteral">        local ipi_uuid=`fqname_to_uuid &quot;</span>$ipi_fqname<span class="stringliteral">&quot; &quot;</span>instance-ip<span class="stringliteral">&quot;`</span></div>
-<div class="line"><a id="l01740" name="l01740"></a><span class="lineno"> 1740</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l01741" name="l01741"></a><span class="lineno"> 1741</span><span class="stringliteral">        if [ &quot;</span>$ipi_uuid<span class="stringliteral">&quot; != &quot;</span><span class="stringliteral">&quot; ] &amp;&amp; [ &quot;</span>$vmi_uuid<span class="stringliteral">&quot; != &quot;</span><span class="stringliteral">&quot; ]</span></div>
-<div class="line"><a id="l01742" name="l01742"></a><span class="lineno"> 1742</span><span class="stringliteral">        then</span></div>
-<div class="line"><a id="l01743" name="l01743"></a><span class="lineno"> 1743</span><span class="stringliteral">            del_reference &quot;</span>$ipi_uuid<span class="stringliteral">&quot; &quot;</span>instance-ip<span class="stringliteral">&quot; &quot;</span>$vmi_uuid<span class="stringliteral">&quot; &quot;</span><span class="keyword">virtual</span>-machine-interface<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01744" name="l01744"></a><span class="lineno"> 1744</span><span class="stringliteral">        fi</span></div>
-<div class="line"><a id="l01745" name="l01745"></a><span class="lineno"> 1745</span><span class="stringliteral">        if [ &quot;</span>$lr_uuid<span class="stringliteral">&quot; != &quot;</span><span class="stringliteral">&quot; ] &amp;&amp; [ &quot;</span>$vmi_uuid<span class="stringliteral">&quot; != &quot;</span><span class="stringliteral">&quot; ]</span></div>
-<div class="line"><a id="l01746" name="l01746"></a><span class="lineno"> 1746</span><span class="stringliteral">        then</span></div>
-<div class="line"><a id="l01747" name="l01747"></a><span class="lineno"> 1747</span><span class="stringliteral">            del_reference &quot;</span>$lr_uuid<span class="stringliteral">&quot; &quot;</span>logical-router<span class="stringliteral">&quot; &quot;</span>$vmi_uuid<span class="stringliteral">&quot; &quot;</span><span class="keyword">virtual</span>-machine-interface<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01748" name="l01748"></a><span class="lineno"> 1748</span><span class="stringliteral">        fi</span></div>
-<div class="line"><a id="l01749" name="l01749"></a><span class="lineno"> 1749</span><span class="stringliteral">        </span></div>
-<div class="line"><a id="l01750" name="l01750"></a><span class="lineno"> 1750</span><span class="stringliteral">        delete_instance_ips &quot;</span>$ipi_lrname<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01751" name="l01751"></a><span class="lineno"> 1751</span><span class="stringliteral">        delete_vm_interfaces &quot;</span>$vmi_lrname<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01752" name="l01752"></a><span class="lineno"> 1752</span><span class="stringliteral">    done</span></div>
-<div class="line"><a id="l01753" name="l01753"></a><span class="lineno"> 1753</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l01754" name="l01754"></a><span class="lineno"> 1754</span><span class="stringliteral">    delete_entity &quot;</span>$lr_uuid<span class="stringliteral">&quot; &quot;</span>logical-router<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01755" name="l01755"></a><span class="lineno"> 1755</span><span class="stringliteral">}</span></div>
-<div class="line"><a id="l01756" name="l01756"></a><span class="lineno"> 1756</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l01757" name="l01757"></a><span class="lineno"> 1757</span><span class="stringliteral">function delete_intf_route_table() {</span></div>
-<div class="line"><a id="l01758" name="l01758"></a><span class="lineno"> 1758</span><span class="stringliteral">    local irt_name=&quot;</span>$1<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01759" name="l01759"></a><span class="lineno"> 1759</span><span class="stringliteral">    local irt_fqname=`name_to_fqname &quot;</span>$irt_name<span class="stringliteral">&quot;`</span></div>
-<div class="line"><a id="l01760" name="l01760"></a><span class="lineno"> 1760</span><span class="stringliteral">    local irt_uuid=`fqname_to_uuid &quot;</span>$irt_fqname<span class="stringliteral">&quot; &quot;</span>interface-route-table<span class="stringliteral">&quot;`</span></div>
-<div class="line"><a id="l01761" name="l01761"></a><span class="lineno"> 1761</span><span class="stringliteral">    if [ &quot;</span>$irt_uuid<span class="stringliteral">&quot; != &quot;</span><span class="stringliteral">&quot; ]</span></div>
-<div class="line"><a id="l01762" name="l01762"></a><span class="lineno"> 1762</span><span class="stringliteral">    then</span></div>
-<div class="line"><a id="l01763" name="l01763"></a><span class="lineno"> 1763</span><span class="stringliteral">        delete_entity &quot;</span>$irt_uuid<span class="stringliteral">&quot; &quot;</span>interface-route-table<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01764" name="l01764"></a><span class="lineno"> 1764</span><span class="stringliteral">    fi</span></div>
-<div class="line"><a id="l01765" name="l01765"></a><span class="lineno"> 1765</span><span class="stringliteral">}</span></div>
-<div class="line"><a id="l01766" name="l01766"></a><span class="lineno"> 1766</span><span class="stringliteral"></span> </div>
-<div class="line"><a id="l01767" name="l01767"></a><span class="lineno"> 1767</span><span class="stringliteral">function delete_virtual_dns() {</span></div>
-<div class="line"><a id="l01768" name="l01768"></a><span class="lineno"> 1768</span><span class="stringliteral">    local dns_name=&quot;</span>$1<span class="stringliteral">&quot;</span></div>
-<div class="line"><a id="l01769" name="l01769"></a><span class="lineno"> 1769</span><span class="stringliteral">    local dns_fqname=&quot;</span>[\<span class="stringliteral">&quot;default-domain\&quot;,\&quot;$dns_name\&quot;]&quot;</span></div>
-<div class="line"><a id="l01770" name="l01770"></a><span class="lineno"> 1770</span>    local dns_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$dns_fqname&quot;</span> <span class="stringliteral">&quot;virtual-DNS&quot;</span>`</div>
-<div class="line"><a id="l01771" name="l01771"></a><span class="lineno"> 1771</span> </div>
-<div class="line"><a id="l01772" name="l01772"></a><span class="lineno"> 1772</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$dns_uuid&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
-<div class="line"><a id="l01773" name="l01773"></a><span class="lineno"> 1773</span>    then</div>
-<div class="line"><a id="l01774" name="l01774"></a><span class="lineno"> 1774</span>        <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$dns_uuid&quot;</span> <span class="stringliteral">&quot;virtual-DNS&quot;</span></div>
-<div class="line"><a id="l01775" name="l01775"></a><span class="lineno"> 1775</span>    fi</div>
-<div class="line"><a id="l01776" name="l01776"></a><span class="lineno"> 1776</span>}</div>
-<div class="line"><a id="l01777" name="l01777"></a><span class="lineno"> 1777</span> </div>
-<div class="line"><a id="l01778" name="l01778"></a><span class="lineno"> 1778</span>function delete_ipam() {</div>
-<div class="line"><a id="l01779" name="l01779"></a><span class="lineno"> 1779</span>    local ipam_name=<span class="stringliteral">&quot;$1&quot;</span></div>
-<div class="line"><a id="l01780" name="l01780"></a><span class="lineno"> 1780</span>    local ipam_fqname=`<a class="code hl_function" href="basic__rest__functions_8sh.html#aa0373715af0257cdfc05aa9d30d6439e">name_to_fqname</a> <span class="stringliteral">&quot;$ipam_name&quot;</span>`</div>
-<div class="line"><a id="l01781" name="l01781"></a><span class="lineno"> 1781</span>    local ipam_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$ipam_fqname&quot;</span> <span class="stringliteral">&quot;network-ipam&quot;</span>`</div>
-<div class="line"><a id="l01782" name="l01782"></a><span class="lineno"> 1782</span> </div>
-<div class="line"><a id="l01783" name="l01783"></a><span class="lineno"> 1783</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$ipam_uuid&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
-<div class="line"><a id="l01784" name="l01784"></a><span class="lineno"> 1784</span>    then</div>
-<div class="line"><a id="l01785" name="l01785"></a><span class="lineno"> 1785</span>        <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$ipam_uuid&quot;</span> <span class="stringliteral">&quot;network-ipam&quot;</span></div>
-<div class="line"><a id="l01786" name="l01786"></a><span class="lineno"> 1786</span>    fi</div>
-<div class="line"><a id="l01787" name="l01787"></a><span class="lineno"> 1787</span>}</div>
-<div class="line"><a id="l01788" name="l01788"></a><span class="lineno"> 1788</span> </div>
-<div class="line"><a id="l01789" name="l01789"></a><span class="lineno"> 1789</span><span class="preprocessor">## @brief A guard variable to prevent recursive execution of basic_rest_functions.sh</span></div>
-<div class="line"><a id="l01790" name="l01790"></a><span class="lineno"><a class="line" href="basic__rest__functions_8sh.html#a8953505cdfb70bf649962db5dd2316ca"> 1790</a></span>export <a class="code hl_variable" href="basic__rest__functions_8sh.html#a8953505cdfb70bf649962db5dd2316ca">BASIC_REST_FUNCTIONS</a>=</div>
-<div class="line"><a id="l01791" name="l01791"></a><span class="lineno"> 1791</span> </div>
+<div class="line"><a id="l01524" name="l01524"></a><span class="lineno"> 1524</span>    <a class="code hl_function" href="basic__rest__functions_8sh.html#a631fef5fa7ed05781e35b6027050d48b">execute_put_request</a> <span class="stringliteral">&quot;$REQ_STR&quot;</span> <span class="stringliteral">&quot;$REQ_URL&quot;</span> &gt;&gt; $MESG_LOG</div>
+<div class="line"><a id="l01525" name="l01525"></a><span class="lineno"> 1525</span>}</div>
+<div class="line"><a id="l01526" name="l01526"></a><span class="lineno"> 1526</span> </div>
+<div class="line"><a id="l01527" name="l01527"></a><span class="lineno"> 1527</span>function get_ll_service_config() {</div>
+<div class="line"><a id="l01528" name="l01528"></a><span class="lineno"> 1528</span>    local ll_services=<span class="stringliteral">&quot;$1&quot;</span></div>
+<div class="line"><a id="l01529" name="l01529"></a><span class="lineno"> 1529</span>    local ll_service_name=<span class="stringliteral">&quot;$2&quot;</span></div>
+<div class="line"><a id="l01530" name="l01530"></a><span class="lineno"> 1530</span>    local n_ll_services=`jq -c -r <span class="stringliteral">&#39;. | length&#39;</span> &lt;&lt;&lt; <span class="stringliteral">&quot;$ll_services&quot;</span>`</div>
+<div class="line"><a id="l01531" name="l01531"></a><span class="lineno"> 1531</span>    local i_service=0</div>
+<div class="line"><a id="l01532" name="l01532"></a><span class="lineno"> 1532</span>    </div>
+<div class="line"><a id="l01533" name="l01533"></a><span class="lineno"> 1533</span>    local ll_config=</div>
+<div class="line"><a id="l01534" name="l01534"></a><span class="lineno"> 1534</span>    local ll_name=</div>
+<div class="line"><a id="l01535" name="l01535"></a><span class="lineno"> 1535</span>    <span class="keywordflow">while</span> [ $i_service -lt $n_ll_services ]</div>
+<div class="line"><a id="l01536" name="l01536"></a><span class="lineno"> 1536</span>    <span class="keywordflow">do</span></div>
+<div class="line"><a id="l01537" name="l01537"></a><span class="lineno"> 1537</span>        ll_config=`jq -c -r <span class="stringliteral">&quot;.[$i_service]&quot;</span> &lt;&lt;&lt; <span class="stringliteral">&quot;$ll_services&quot;</span>`</div>
+<div class="line"><a id="l01538" name="l01538"></a><span class="lineno"> 1538</span>        ll_name=`jq -c -r <span class="stringliteral">&quot;.linklocal_service_name&quot;</span> &lt;&lt;&lt; <span class="stringliteral">&quot;$ll_config&quot;</span>`</div>
+<div class="line"><a id="l01539" name="l01539"></a><span class="lineno"> 1539</span>        <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$ll_name&quot;</span> = <span class="stringliteral">&quot;$ll_service_name&quot;</span> ]</div>
+<div class="line"><a id="l01540" name="l01540"></a><span class="lineno"> 1540</span>        then</div>
+<div class="line"><a id="l01541" name="l01541"></a><span class="lineno"> 1541</span>            <span class="keywordflow">break</span></div>
+<div class="line"><a id="l01542" name="l01542"></a><span class="lineno"> 1542</span>        fi</div>
+<div class="line"><a id="l01543" name="l01543"></a><span class="lineno"> 1543</span>        i_service=`expr $i_service + 1`</div>
+<div class="line"><a id="l01544" name="l01544"></a><span class="lineno"> 1544</span>    done</div>
+<div class="line"><a id="l01545" name="l01545"></a><span class="lineno"> 1545</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$ll_name&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
+<div class="line"><a id="l01546" name="l01546"></a><span class="lineno"> 1546</span>    then</div>
+<div class="line"><a id="l01547" name="l01547"></a><span class="lineno"> 1547</span>        echo $ll_config</div>
+<div class="line"><a id="l01548" name="l01548"></a><span class="lineno"> 1548</span>        <span class="keywordflow">return</span> 0</div>
+<div class="line"><a id="l01549" name="l01549"></a><span class="lineno"> 1549</span>    fi</div>
+<div class="line"><a id="l01550" name="l01550"></a><span class="lineno"> 1550</span>    echo <span class="stringliteral">&quot;Link local service was not found&quot;</span></div>
+<div class="line"><a id="l01551" name="l01551"></a><span class="lineno"> 1551</span>    <span class="keywordflow">return</span> 1</div>
+<div class="line"><a id="l01552" name="l01552"></a><span class="lineno"> 1552</span>}</div>
+<div class="line"><a id="l01553" name="l01553"></a><span class="lineno"> 1553</span> </div>
+<div class="line"><a id="l01554" name="l01554"></a><span class="lineno"> 1554</span>function del_ll_service() {</div>
+<div class="line"><a id="l01555" name="l01555"></a><span class="lineno"> 1555</span>    local gvr_fqname=<span class="stringliteral">&quot;$1&quot;</span></div>
+<div class="line"><a id="l01556" name="l01556"></a><span class="lineno"> 1556</span>    local ll_service_name=<span class="stringliteral">&quot;$2&quot;</span></div>
+<div class="line"><a id="l01557" name="l01557"></a><span class="lineno"> 1557</span>    local ll_services_config=`get_ll_services <span class="stringliteral">&quot;$gvr_fqname&quot;</span>`</div>
+<div class="line"><a id="l01558" name="l01558"></a><span class="lineno"> 1558</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$ll_services_config&quot;</span> = <span class="stringliteral">&quot;&quot;</span> ]</div>
+<div class="line"><a id="l01559" name="l01559"></a><span class="lineno"> 1559</span>    then</div>
+<div class="line"><a id="l01560" name="l01560"></a><span class="lineno"> 1560</span>        echo <span class="stringliteral">&quot;Cant retrieve link local services&quot;</span></div>
+<div class="line"><a id="l01561" name="l01561"></a><span class="lineno"> 1561</span>        <span class="keywordflow">return</span> 1</div>
+<div class="line"><a id="l01562" name="l01562"></a><span class="lineno"> 1562</span>    fi</div>
+<div class="line"><a id="l01563" name="l01563"></a><span class="lineno"> 1563</span><span class="preprocessor">    #</span></div>
+<div class="line"><a id="l01564" name="l01564"></a><span class="lineno"> 1564</span>    local gvr_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$gvr_fqname&quot;</span> <span class="stringliteral">&quot;global-vrouter-config&quot;</span>`</div>
+<div class="line"><a id="l01565" name="l01565"></a><span class="lineno"> 1565</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$gvr_uuid&quot;</span> = <span class="stringliteral">&quot;&quot;</span> ]</div>
+<div class="line"><a id="l01566" name="l01566"></a><span class="lineno"> 1566</span>    then</div>
+<div class="line"><a id="l01567" name="l01567"></a><span class="lineno"> 1567</span>        echo <span class="stringliteral">&quot;UUID for $gvr_fqname was not found&quot;</span></div>
+<div class="line"><a id="l01568" name="l01568"></a><span class="lineno"> 1568</span>        <span class="keywordflow">return</span> 1</div>
+<div class="line"><a id="l01569" name="l01569"></a><span class="lineno"> 1569</span>    fi</div>
+<div class="line"><a id="l01570" name="l01570"></a><span class="lineno"> 1570</span>    local n_services=`jq -c -r <span class="stringliteral">&#39;. | length&#39;</span> &lt;&lt;&lt; <span class="stringliteral">&quot;$ll_services_config&quot;</span>`</div>
+<div class="line"><a id="l01571" name="l01571"></a><span class="lineno"> 1571</span>    local i_service=0</div>
+<div class="line"><a id="l01572" name="l01572"></a><span class="lineno"> 1572</span>    local ll_config=</div>
+<div class="line"><a id="l01573" name="l01573"></a><span class="lineno"> 1573</span>    local ll_name=</div>
+<div class="line"><a id="l01574" name="l01574"></a><span class="lineno"> 1574</span>    local new_ll_config=</div>
+<div class="line"><a id="l01575" name="l01575"></a><span class="lineno"> 1575</span>    <span class="keywordflow">while</span> [ $i_service -lt $n_services ]</div>
+<div class="line"><a id="l01576" name="l01576"></a><span class="lineno"> 1576</span>    <span class="keywordflow">do</span></div>
+<div class="line"><a id="l01577" name="l01577"></a><span class="lineno"> 1577</span>        ll_config=`jq -c -r <span class="stringliteral">&quot;.[$i_service]&quot;</span> &lt;&lt;&lt; <span class="stringliteral">&quot;$ll_services_config&quot;</span>`</div>
+<div class="line"><a id="l01578" name="l01578"></a><span class="lineno"> 1578</span>        ll_name=`jq -c -r <span class="stringliteral">&quot;.linklocal_service_name&quot;</span> &lt;&lt;&lt; <span class="stringliteral">&quot;$ll_config&quot;</span>`</div>
+<div class="line"><a id="l01579" name="l01579"></a><span class="lineno"> 1579</span><span class="preprocessor">        # echo &quot;ll_config=$ll_config&quot;</span></div>
+<div class="line"><a id="l01580" name="l01580"></a><span class="lineno"> 1580</span>        <span class="keywordflow">if</span> [ ! <span class="stringliteral">&quot;$ll_name&quot;</span> = <span class="stringliteral">&quot;$ll_service_name&quot;</span> ]</div>
+<div class="line"><a id="l01581" name="l01581"></a><span class="lineno"> 1581</span>        then</div>
+<div class="line"><a id="l01582" name="l01582"></a><span class="lineno"> 1582</span>            new_ll_config=<span class="stringliteral">&quot;$ll_config,$new_ll_config&quot;</span></div>
+<div class="line"><a id="l01583" name="l01583"></a><span class="lineno"> 1583</span>        fi</div>
+<div class="line"><a id="l01584" name="l01584"></a><span class="lineno"> 1584</span>        i_service=`expr $i_service + 1`</div>
+<div class="line"><a id="l01585" name="l01585"></a><span class="lineno"> 1585</span>    done</div>
+<div class="line"><a id="l01586" name="l01586"></a><span class="lineno"> 1586</span>    new_ll_config=${new_ll_config::-1} #remove last <span class="stringliteral">&quot;,&quot;</span></div>
+<div class="line"><a id="l01587" name="l01587"></a><span class="lineno"> 1587</span>    new_ll_config=<span class="stringliteral">&quot;[$new_ll_config]&quot;</span></div>
+<div class="line"><a id="l01588" name="l01588"></a><span class="lineno"> 1588</span> </div>
+<div class="line"><a id="l01589" name="l01589"></a><span class="lineno"> 1589</span>    local REQ_STR=</div>
+<div class="line"><a id="l01590" name="l01590"></a><span class="lineno"> 1590</span>    read -r -d <span class="stringliteral">&#39;&#39;</span> REQ_STR &lt;&lt;- REQ_MARKER</div>
+<div class="line"><a id="l01591" name="l01591"></a><span class="lineno"> 1591</span>    {</div>
+<div class="line"><a id="l01592" name="l01592"></a><span class="lineno"> 1592</span>        <span class="stringliteral">&quot;global-vrouter-config&quot;</span>:</div>
+<div class="line"><a id="l01593" name="l01593"></a><span class="lineno"> 1593</span>        {</div>
+<div class="line"><a id="l01594" name="l01594"></a><span class="lineno"> 1594</span>            <span class="stringliteral">&quot;linklocal_services&quot;</span>:</div>
+<div class="line"><a id="l01595" name="l01595"></a><span class="lineno"> 1595</span>            {</div>
+<div class="line"><a id="l01596" name="l01596"></a><span class="lineno"> 1596</span>                <span class="stringliteral">&quot;linklocal_service_entry&quot;</span>:$new_ll_config</div>
+<div class="line"><a id="l01597" name="l01597"></a><span class="lineno"> 1597</span>            }</div>
+<div class="line"><a id="l01598" name="l01598"></a><span class="lineno"> 1598</span>        }</div>
+<div class="line"><a id="l01599" name="l01599"></a><span class="lineno"> 1599</span>    }</div>
+<div class="line"><a id="l01600" name="l01600"></a><span class="lineno"> 1600</span>REQ_MARKER</div>
+<div class="line"><a id="l01601" name="l01601"></a><span class="lineno"> 1601</span>    local REQ_URL=<span class="stringliteral">&quot;$REST_ADDRESS/global-vrouter-config/$gvr_uuid&quot;</span></div>
+<div class="line"><a id="l01602" name="l01602"></a><span class="lineno"> 1602</span>    REQ_STR=`echo $REQ_STR`</div>
+<div class="line"><a id="l01603" name="l01603"></a><span class="lineno"> 1603</span>    echo &gt;&gt; $MESG_LOG</div>
+<div class="line"><a id="l01604" name="l01604"></a><span class="lineno"> 1604</span>    <a class="code hl_function" href="basic__rest__functions_8sh.html#a631fef5fa7ed05781e35b6027050d48b">execute_put_request</a> <span class="stringliteral">&quot;$REQ_STR&quot;</span> <span class="stringliteral">&quot;$REQ_URL&quot;</span> &gt;&gt; $MESG_LOG</div>
+<div class="line"><a id="l01605" name="l01605"></a><span class="lineno"> 1605</span>}</div>
+<div class="line"><a id="l01606" name="l01606"></a><span class="lineno"> 1606</span> </div>
+<div class="line"><a id="l01607" name="l01607"></a><span class="lineno"> 1607</span>function delete_floating_ips() {</div>
+<div class="line"><a id="l01608" name="l01608"></a><span class="lineno"> 1608</span>    local iip_fips=<span class="stringliteral">&quot;$1&quot;</span></div>
+<div class="line"><a id="l01609" name="l01609"></a><span class="lineno"> 1609</span> </div>
+<div class="line"><a id="l01610" name="l01610"></a><span class="lineno"> 1610</span>    local iip_name=</div>
+<div class="line"><a id="l01611" name="l01611"></a><span class="lineno"> 1611</span>    local fip_name=</div>
+<div class="line"><a id="l01612" name="l01612"></a><span class="lineno"> 1612</span>    local fip_pos=</div>
+<div class="line"><a id="l01613" name="l01613"></a><span class="lineno"> 1613</span>    local fip_fqname=</div>
+<div class="line"><a id="l01614" name="l01614"></a><span class="lineno"> 1614</span>    local fip_uuid=</div>
+<div class="line"><a id="l01615" name="l01615"></a><span class="lineno"> 1615</span>    <span class="keywordflow">for</span> iip_fip in $iip_fips</div>
+<div class="line"><a id="l01616" name="l01616"></a><span class="lineno"> 1616</span>    <span class="keywordflow">do</span></div>
+<div class="line"><a id="l01617" name="l01617"></a><span class="lineno"> 1617</span> </div>
+<div class="line"><a id="l01618" name="l01618"></a><span class="lineno"> 1618</span>        fip_name=${iip_fip#*<span class="stringliteral">&quot;,&quot;</span>}</div>
+<div class="line"><a id="l01619" name="l01619"></a><span class="lineno"> 1619</span>        fip_pos=$(( ${#iip_fip} - ${#fip_name} - 1 ))</div>
+<div class="line"><a id="l01620" name="l01620"></a><span class="lineno"> 1620</span>        iip_name=<span class="stringliteral">&quot;${iip_fip:0:$fip_pos}&quot;</span></div>
+<div class="line"><a id="l01621" name="l01621"></a><span class="lineno"> 1621</span> </div>
+<div class="line"><a id="l01622" name="l01622"></a><span class="lineno"> 1622</span>        fip_fqname=<span class="stringliteral">&quot;[\&quot;$iip_name\&quot;, \&quot;$fip_name\&quot;]&quot;</span></div>
+<div class="line"><a id="l01623" name="l01623"></a><span class="lineno"> 1623</span>        fip_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$fip_fqname&quot;</span> <span class="stringliteral">&quot;floating-ip&quot;</span>`</div>
+<div class="line"><a id="l01624" name="l01624"></a><span class="lineno"> 1624</span>        <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$fip_uuid&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
+<div class="line"><a id="l01625" name="l01625"></a><span class="lineno"> 1625</span>        then</div>
+<div class="line"><a id="l01626" name="l01626"></a><span class="lineno"> 1626</span>            <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$fip_uuid&quot;</span> <span class="stringliteral">&quot;floating-ip&quot;</span></div>
+<div class="line"><a id="l01627" name="l01627"></a><span class="lineno"> 1627</span>        fi</div>
+<div class="line"><a id="l01628" name="l01628"></a><span class="lineno"> 1628</span>    done</div>
+<div class="line"><a id="l01629" name="l01629"></a><span class="lineno"> 1629</span>}</div>
+<div class="line"><a id="l01630" name="l01630"></a><span class="lineno"> 1630</span> </div>
+<div class="line"><a id="l01631" name="l01631"></a><span class="lineno"> 1631</span>function delete_instance_ips(){</div>
+<div class="line"><a id="l01632" name="l01632"></a><span class="lineno"> 1632</span>    local ipis=$1</div>
+<div class="line"><a id="l01633" name="l01633"></a><span class="lineno"> 1633</span>    <span class="keywordflow">for</span> ipi in $ipis</div>
+<div class="line"><a id="l01634" name="l01634"></a><span class="lineno"> 1634</span>    <span class="keywordflow">do</span></div>
+<div class="line"><a id="l01635" name="l01635"></a><span class="lineno"> 1635</span>        local ipi_fqname=<span class="stringliteral">&quot;[\&quot;$ipi\&quot;]&quot;</span></div>
+<div class="line"><a id="l01636" name="l01636"></a><span class="lineno"> 1636</span>        echo <span class="stringliteral">&quot;Deleting $ipi_fqname&quot;</span> &gt;&gt; $MESG_LOG</div>
+<div class="line"><a id="l01637" name="l01637"></a><span class="lineno"> 1637</span>        local ipi_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$ipi_fqname&quot;</span> <span class="stringliteral">&quot;instance-ip&quot;</span>`</div>
+<div class="line"><a id="l01638" name="l01638"></a><span class="lineno"> 1638</span>        <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$ipi_uuid&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
+<div class="line"><a id="l01639" name="l01639"></a><span class="lineno"> 1639</span>        then</div>
+<div class="line"><a id="l01640" name="l01640"></a><span class="lineno"> 1640</span>            <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$ipi_uuid&quot;</span> <span class="stringliteral">&quot;instance-ip&quot;</span></div>
+<div class="line"><a id="l01641" name="l01641"></a><span class="lineno"> 1641</span>        fi</div>
+<div class="line"><a id="l01642" name="l01642"></a><span class="lineno"> 1642</span>    done</div>
+<div class="line"><a id="l01643" name="l01643"></a><span class="lineno"> 1643</span>}</div>
+<div class="line"><a id="l01644" name="l01644"></a><span class="lineno"> 1644</span> </div>
+<div class="line"><a id="l01645" name="l01645"></a><span class="lineno"> 1645</span>function delete_vm_interfaces(){</div>
+<div class="line"><a id="l01646" name="l01646"></a><span class="lineno"> 1646</span>    local vmis=$1</div>
+<div class="line"><a id="l01647" name="l01647"></a><span class="lineno"> 1647</span>    <span class="keywordflow">for</span> vmi in $vmis</div>
+<div class="line"><a id="l01648" name="l01648"></a><span class="lineno"> 1648</span>    <span class="keywordflow">do</span></div>
+<div class="line"><a id="l01649" name="l01649"></a><span class="lineno"> 1649</span>        local vmi_fqname=`<a class="code hl_function" href="basic__rest__functions_8sh.html#aa0373715af0257cdfc05aa9d30d6439e">name_to_fqname</a> $vmi`</div>
+<div class="line"><a id="l01650" name="l01650"></a><span class="lineno"> 1650</span>        echo <span class="stringliteral">&quot;Deleting $vmi_fqname&quot;</span> &gt;&gt; $MESG_LOG</div>
+<div class="line"><a id="l01651" name="l01651"></a><span class="lineno"> 1651</span>        local vmi_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$vmi_fqname&quot;</span> <span class="stringliteral">&quot;virtual-machine-interface&quot;</span>`</div>
+<div class="line"><a id="l01652" name="l01652"></a><span class="lineno"> 1652</span>        <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$vmi_uuid&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
+<div class="line"><a id="l01653" name="l01653"></a><span class="lineno"> 1653</span>        then</div>
+<div class="line"><a id="l01654" name="l01654"></a><span class="lineno"> 1654</span>            <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$vmi_uuid&quot;</span> <span class="stringliteral">&quot;virtual-machine-interface&quot;</span></div>
+<div class="line"><a id="l01655" name="l01655"></a><span class="lineno"> 1655</span>        fi</div>
+<div class="line"><a id="l01656" name="l01656"></a><span class="lineno"> 1656</span>    done</div>
+<div class="line"><a id="l01657" name="l01657"></a><span class="lineno"> 1657</span>}</div>
+<div class="line"><a id="l01658" name="l01658"></a><span class="lineno"> 1658</span> </div>
+<div class="line"><a id="l01659" name="l01659"></a><span class="lineno"> 1659</span>function delete_bgpaases(){</div>
+<div class="line"><a id="l01660" name="l01660"></a><span class="lineno"> 1660</span>    local bgps=$1</div>
+<div class="line"><a id="l01661" name="l01661"></a><span class="lineno"> 1661</span>    <span class="keywordflow">for</span> bgpaas in $bgps</div>
+<div class="line"><a id="l01662" name="l01662"></a><span class="lineno"> 1662</span>    <span class="keywordflow">do</span></div>
+<div class="line"><a id="l01663" name="l01663"></a><span class="lineno"> 1663</span>        local bgpaas_fqname=`<a class="code hl_function" href="basic__rest__functions_8sh.html#aa0373715af0257cdfc05aa9d30d6439e">name_to_fqname</a> $bgpaas`</div>
+<div class="line"><a id="l01664" name="l01664"></a><span class="lineno"> 1664</span>        echo <span class="stringliteral">&quot;Deleting $bgpaas_fqname&quot;</span> &gt;&gt; $MESG_LOG</div>
+<div class="line"><a id="l01665" name="l01665"></a><span class="lineno"> 1665</span>        local bgpaas_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$bgpaas_fqname&quot;</span> <span class="stringliteral">&quot;bgp-as-a-service&quot;</span>`</div>
+<div class="line"><a id="l01666" name="l01666"></a><span class="lineno"> 1666</span>        <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$bgpaas_uuid&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
+<div class="line"><a id="l01667" name="l01667"></a><span class="lineno"> 1667</span>        then</div>
+<div class="line"><a id="l01668" name="l01668"></a><span class="lineno"> 1668</span>            <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$bgpaas_uuid&quot;</span> <span class="stringliteral">&quot;bgp-as-a-service&quot;</span></div>
+<div class="line"><a id="l01669" name="l01669"></a><span class="lineno"> 1669</span>        fi</div>
+<div class="line"><a id="l01670" name="l01670"></a><span class="lineno"> 1670</span>    done</div>
+<div class="line"><a id="l01671" name="l01671"></a><span class="lineno"> 1671</span>}</div>
+<div class="line"><a id="l01672" name="l01672"></a><span class="lineno"> 1672</span> </div>
+<div class="line"><a id="l01673" name="l01673"></a><span class="lineno"> 1673</span>function delete_networks(){</div>
+<div class="line"><a id="l01674" name="l01674"></a><span class="lineno"> 1674</span>    local networks=<span class="stringliteral">&quot;$1&quot;</span></div>
+<div class="line"><a id="l01675" name="l01675"></a><span class="lineno"> 1675</span>    <span class="keywordflow">for</span> nw in $networks</div>
+<div class="line"><a id="l01676" name="l01676"></a><span class="lineno"> 1676</span>    <span class="keywordflow">do</span></div>
+<div class="line"><a id="l01677" name="l01677"></a><span class="lineno"> 1677</span>        echo <span class="stringliteral">&quot;Deleting nw $nw&quot;</span> &gt;&gt; $MESG_LOG</div>
+<div class="line"><a id="l01678" name="l01678"></a><span class="lineno"> 1678</span>        nw_fqname=`<a class="code hl_function" href="basic__rest__functions_8sh.html#aa0373715af0257cdfc05aa9d30d6439e">name_to_fqname</a> $nw`</div>
+<div class="line"><a id="l01679" name="l01679"></a><span class="lineno"> 1679</span>        nw_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$nw_fqname&quot;</span> <span class="stringliteral">&quot;virtual-network&quot;</span>`</div>
+<div class="line"><a id="l01680" name="l01680"></a><span class="lineno"> 1680</span>        <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$nw_uuid&quot;</span> <span class="stringliteral">&quot;virtual-network&quot;</span></div>
+<div class="line"><a id="l01681" name="l01681"></a><span class="lineno"> 1681</span>    done</div>
+<div class="line"><a id="l01682" name="l01682"></a><span class="lineno"> 1682</span>}</div>
+<div class="line"><a id="l01683" name="l01683"></a><span class="lineno"> 1683</span> </div>
+<div class="line"><a id="l01684" name="l01684"></a><span class="lineno"> 1684</span><span class="preprocessor"># @fn prefix_delete_vm_interfaces</span></div>
+<div class="line"><a id="l01685" name="l01685"></a><span class="lineno"> 1685</span><span class="preprocessor"># @brief This deletes all vmi&#39;s with a given prefix</span></div>
+<div class="line"><a id="l01686" name="l01686"></a><span class="lineno"> 1686</span>function prefix_delete_vm_interfaces(){</div>
+<div class="line"><a id="l01687" name="l01687"></a><span class="lineno"> 1687</span>    local vm_prefix=$1</div>
+<div class="line"><a id="l01688" name="l01688"></a><span class="lineno"> 1688</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$vm_prefix&quot;</span> = <span class="stringliteral">&quot;&quot;</span> ]</div>
+<div class="line"><a id="l01689" name="l01689"></a><span class="lineno"> 1689</span>    then</div>
+<div class="line"><a id="l01690" name="l01690"></a><span class="lineno"> 1690</span>        <span class="keywordflow">return</span> 1</div>
+<div class="line"><a id="l01691" name="l01691"></a><span class="lineno"> 1691</span>    fi</div>
+<div class="line"><a id="l01692" name="l01692"></a><span class="lineno"> 1692</span>    local myvmis=`curl $REST_ADDRESS/<span class="keyword">virtual</span>-machine-interfaces\</div>
+<div class="line"><a id="l01693" name="l01693"></a><span class="lineno"> 1693</span>        | python3 -m json.tool | grep <span class="stringliteral">&quot;$vm_prefix&quot;</span>`</div>
+<div class="line"><a id="l01694" name="l01694"></a><span class="lineno"> 1694</span>    local vmis_stripped=<span class="stringliteral">&quot;&quot;</span></div>
+<div class="line"><a id="l01695" name="l01695"></a><span class="lineno"> 1695</span>    <span class="keywordflow">for</span> vmi in $myvmis</div>
+<div class="line"><a id="l01696" name="l01696"></a><span class="lineno"> 1696</span>    <span class="keywordflow">do</span></div>
+<div class="line"><a id="l01697" name="l01697"></a><span class="lineno"> 1697</span>        local tmp=${vmi#*\<span class="stringliteral">&quot;}</span></div>
+<div class="line"><a id="l01698" name="l01698"></a><span class="lineno"> 1698</span><span class="stringliteral">        local v=${tmp%\&quot;*}</span></div>
+<div class="line"><a id="l01699" name="l01699"></a><span class="lineno"> 1699</span><span class="stringliteral">        vmis_stripped=&quot;</span>$v $vmis_stripped<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01700" name="l01700"></a><span class="lineno"> 1700</span><span class="stringliteral">    done</span></div>
+<div class="line"><a id="l01701" name="l01701"></a><span class="lineno"> 1701</span><span class="stringliteral">    delete_vm_interfaces &quot;</span>$vmis_stripped<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01702" name="l01702"></a><span class="lineno"> 1702</span><span class="stringliteral">}</span></div>
+<div class="line"><a id="l01703" name="l01703"></a><span class="lineno"> 1703</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l01704" name="l01704"></a><span class="lineno"> 1704</span><span class="stringliteral"># @fn prefix_delete_ip_instances</span></div>
+<div class="line"><a id="l01705" name="l01705"></a><span class="lineno"> 1705</span><span class="stringliteral"># @brief This deletes all IP instances with a given prefix</span></div>
+<div class="line"><a id="l01706" name="l01706"></a><span class="lineno"> 1706</span><span class="stringliteral">function prefix_delete_ip_instances(){</span></div>
+<div class="line"><a id="l01707" name="l01707"></a><span class="lineno"> 1707</span><span class="stringliteral">    local ipi_prefix=$1</span></div>
+<div class="line"><a id="l01708" name="l01708"></a><span class="lineno"> 1708</span><span class="stringliteral">    if [ &quot;</span>$ipi_prefix<span class="stringliteral">&quot; = &quot;</span><span class="stringliteral">&quot; ]</span></div>
+<div class="line"><a id="l01709" name="l01709"></a><span class="lineno"> 1709</span><span class="stringliteral">    then</span></div>
+<div class="line"><a id="l01710" name="l01710"></a><span class="lineno"> 1710</span><span class="stringliteral">        return 1</span></div>
+<div class="line"><a id="l01711" name="l01711"></a><span class="lineno"> 1711</span><span class="stringliteral">    fi</span></div>
+<div class="line"><a id="l01712" name="l01712"></a><span class="lineno"> 1712</span><span class="stringliteral">    local myipis=`curl $REST_ADDRESS/instance-ips\</span></div>
+<div class="line"><a id="l01713" name="l01713"></a><span class="lineno"> 1713</span><span class="stringliteral">        | python3 -m json.tool | grep &quot;</span>$ipi_prefix<span class="stringliteral">&quot;`</span></div>
+<div class="line"><a id="l01714" name="l01714"></a><span class="lineno"> 1714</span><span class="stringliteral">    local ipis_stripped=&quot;</span><span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01715" name="l01715"></a><span class="lineno"> 1715</span><span class="stringliteral">    for ipi in $myipis</span></div>
+<div class="line"><a id="l01716" name="l01716"></a><span class="lineno"> 1716</span><span class="stringliteral">    do</span></div>
+<div class="line"><a id="l01717" name="l01717"></a><span class="lineno"> 1717</span><span class="stringliteral">        local tmp=${ipi#*\&quot;}</span></div>
+<div class="line"><a id="l01718" name="l01718"></a><span class="lineno"> 1718</span><span class="stringliteral">        local i=${tmp%\&quot;*}</span></div>
+<div class="line"><a id="l01719" name="l01719"></a><span class="lineno"> 1719</span><span class="stringliteral">        ipis_stripped=&quot;</span>$i $ipis_stripped<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01720" name="l01720"></a><span class="lineno"> 1720</span><span class="stringliteral">    done</span></div>
+<div class="line"><a id="l01721" name="l01721"></a><span class="lineno"> 1721</span><span class="stringliteral">    delete_instance_ips &quot;</span>$ipis_stripped<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01722" name="l01722"></a><span class="lineno"> 1722</span><span class="stringliteral">}</span></div>
+<div class="line"><a id="l01723" name="l01723"></a><span class="lineno"> 1723</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l01724" name="l01724"></a><span class="lineno"> 1724</span><span class="stringliteral">function delete_logical_router() {</span></div>
+<div class="line"><a id="l01725" name="l01725"></a><span class="lineno"> 1725</span><span class="stringliteral">    local lr_name=&quot;</span>$1<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01726" name="l01726"></a><span class="lineno"> 1726</span><span class="stringliteral">    local nw_names=&quot;</span>$2<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01727" name="l01727"></a><span class="lineno"> 1727</span><span class="stringliteral">    local lr_fqname=`name_to_fqname $lr_name`</span></div>
+<div class="line"><a id="l01728" name="l01728"></a><span class="lineno"> 1728</span><span class="stringliteral">    local lr_uuid=`fqname_to_uuid &quot;</span>$lr_fqname<span class="stringliteral">&quot; &quot;</span>logical-router<span class="stringliteral">&quot;`</span></div>
+<div class="line"><a id="l01729" name="l01729"></a><span class="lineno"> 1729</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l01730" name="l01730"></a><span class="lineno"> 1730</span><span class="stringliteral">    for nw_name in $nw_names</span></div>
+<div class="line"><a id="l01731" name="l01731"></a><span class="lineno"> 1731</span><span class="stringliteral">    do</span></div>
+<div class="line"><a id="l01732" name="l01732"></a><span class="lineno"> 1732</span><span class="stringliteral">        local vmi_lrname=&quot;</span>vmi-lr-<span class="stringliteral">&quot;&quot;</span>$lr_name<span class="stringliteral">&quot;-&quot;</span>$nw_name<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01733" name="l01733"></a><span class="lineno"> 1733</span><span class="stringliteral">        local ipi_lrname=&quot;</span>ipi-lr-<span class="stringliteral">&quot;&quot;</span>$lr_name<span class="stringliteral">&quot;-&quot;</span>$nw_name<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01734" name="l01734"></a><span class="lineno"> 1734</span><span class="stringliteral">        local vmi_fqname=`name_to_fqname $vmi_lrname`</span></div>
+<div class="line"><a id="l01735" name="l01735"></a><span class="lineno"> 1735</span><span class="stringliteral">        local ipi_fqname=`name_to_fqname $ipi_lrname`</span></div>
+<div class="line"><a id="l01736" name="l01736"></a><span class="lineno"> 1736</span><span class="stringliteral">        local vmi_uuid=`fqname_to_uuid &quot;</span>$vmi_fqname<span class="stringliteral">&quot; &quot;</span><span class="keyword">virtual</span>-machine-interface<span class="stringliteral">&quot;`</span></div>
+<div class="line"><a id="l01737" name="l01737"></a><span class="lineno"> 1737</span><span class="stringliteral">        local ipi_uuid=`fqname_to_uuid &quot;</span>$ipi_fqname<span class="stringliteral">&quot; &quot;</span>instance-ip<span class="stringliteral">&quot;`</span></div>
+<div class="line"><a id="l01738" name="l01738"></a><span class="lineno"> 1738</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l01739" name="l01739"></a><span class="lineno"> 1739</span><span class="stringliteral">        if [ &quot;</span>$ipi_uuid<span class="stringliteral">&quot; != &quot;</span><span class="stringliteral">&quot; ] &amp;&amp; [ &quot;</span>$vmi_uuid<span class="stringliteral">&quot; != &quot;</span><span class="stringliteral">&quot; ]</span></div>
+<div class="line"><a id="l01740" name="l01740"></a><span class="lineno"> 1740</span><span class="stringliteral">        then</span></div>
+<div class="line"><a id="l01741" name="l01741"></a><span class="lineno"> 1741</span><span class="stringliteral">            del_reference &quot;</span>$ipi_uuid<span class="stringliteral">&quot; &quot;</span>instance-ip<span class="stringliteral">&quot; &quot;</span>$vmi_uuid<span class="stringliteral">&quot; &quot;</span><span class="keyword">virtual</span>-machine-interface<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01742" name="l01742"></a><span class="lineno"> 1742</span><span class="stringliteral">        fi</span></div>
+<div class="line"><a id="l01743" name="l01743"></a><span class="lineno"> 1743</span><span class="stringliteral">        if [ &quot;</span>$lr_uuid<span class="stringliteral">&quot; != &quot;</span><span class="stringliteral">&quot; ] &amp;&amp; [ &quot;</span>$vmi_uuid<span class="stringliteral">&quot; != &quot;</span><span class="stringliteral">&quot; ]</span></div>
+<div class="line"><a id="l01744" name="l01744"></a><span class="lineno"> 1744</span><span class="stringliteral">        then</span></div>
+<div class="line"><a id="l01745" name="l01745"></a><span class="lineno"> 1745</span><span class="stringliteral">            del_reference &quot;</span>$lr_uuid<span class="stringliteral">&quot; &quot;</span>logical-router<span class="stringliteral">&quot; &quot;</span>$vmi_uuid<span class="stringliteral">&quot; &quot;</span><span class="keyword">virtual</span>-machine-interface<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01746" name="l01746"></a><span class="lineno"> 1746</span><span class="stringliteral">        fi</span></div>
+<div class="line"><a id="l01747" name="l01747"></a><span class="lineno"> 1747</span><span class="stringliteral">        </span></div>
+<div class="line"><a id="l01748" name="l01748"></a><span class="lineno"> 1748</span><span class="stringliteral">        delete_instance_ips &quot;</span>$ipi_lrname<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01749" name="l01749"></a><span class="lineno"> 1749</span><span class="stringliteral">        delete_vm_interfaces &quot;</span>$vmi_lrname<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01750" name="l01750"></a><span class="lineno"> 1750</span><span class="stringliteral">    done</span></div>
+<div class="line"><a id="l01751" name="l01751"></a><span class="lineno"> 1751</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l01752" name="l01752"></a><span class="lineno"> 1752</span><span class="stringliteral">    delete_entity &quot;</span>$lr_uuid<span class="stringliteral">&quot; &quot;</span>logical-router<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01753" name="l01753"></a><span class="lineno"> 1753</span><span class="stringliteral">}</span></div>
+<div class="line"><a id="l01754" name="l01754"></a><span class="lineno"> 1754</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l01755" name="l01755"></a><span class="lineno"> 1755</span><span class="stringliteral">function delete_intf_route_table() {</span></div>
+<div class="line"><a id="l01756" name="l01756"></a><span class="lineno"> 1756</span><span class="stringliteral">    local irt_name=&quot;</span>$1<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01757" name="l01757"></a><span class="lineno"> 1757</span><span class="stringliteral">    local irt_fqname=`name_to_fqname &quot;</span>$irt_name<span class="stringliteral">&quot;`</span></div>
+<div class="line"><a id="l01758" name="l01758"></a><span class="lineno"> 1758</span><span class="stringliteral">    local irt_uuid=`fqname_to_uuid &quot;</span>$irt_fqname<span class="stringliteral">&quot; &quot;</span>interface-route-table<span class="stringliteral">&quot;`</span></div>
+<div class="line"><a id="l01759" name="l01759"></a><span class="lineno"> 1759</span><span class="stringliteral">    if [ &quot;</span>$irt_uuid<span class="stringliteral">&quot; != &quot;</span><span class="stringliteral">&quot; ]</span></div>
+<div class="line"><a id="l01760" name="l01760"></a><span class="lineno"> 1760</span><span class="stringliteral">    then</span></div>
+<div class="line"><a id="l01761" name="l01761"></a><span class="lineno"> 1761</span><span class="stringliteral">        delete_entity &quot;</span>$irt_uuid<span class="stringliteral">&quot; &quot;</span>interface-route-table<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01762" name="l01762"></a><span class="lineno"> 1762</span><span class="stringliteral">    fi</span></div>
+<div class="line"><a id="l01763" name="l01763"></a><span class="lineno"> 1763</span><span class="stringliteral">}</span></div>
+<div class="line"><a id="l01764" name="l01764"></a><span class="lineno"> 1764</span><span class="stringliteral"></span> </div>
+<div class="line"><a id="l01765" name="l01765"></a><span class="lineno"> 1765</span><span class="stringliteral">function delete_virtual_dns() {</span></div>
+<div class="line"><a id="l01766" name="l01766"></a><span class="lineno"> 1766</span><span class="stringliteral">    local dns_name=&quot;</span>$1<span class="stringliteral">&quot;</span></div>
+<div class="line"><a id="l01767" name="l01767"></a><span class="lineno"> 1767</span><span class="stringliteral">    local dns_fqname=&quot;</span>[\<span class="stringliteral">&quot;default-domain\&quot;,\&quot;$dns_name\&quot;]&quot;</span></div>
+<div class="line"><a id="l01768" name="l01768"></a><span class="lineno"> 1768</span>    local dns_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$dns_fqname&quot;</span> <span class="stringliteral">&quot;virtual-DNS&quot;</span>`</div>
+<div class="line"><a id="l01769" name="l01769"></a><span class="lineno"> 1769</span> </div>
+<div class="line"><a id="l01770" name="l01770"></a><span class="lineno"> 1770</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$dns_uuid&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
+<div class="line"><a id="l01771" name="l01771"></a><span class="lineno"> 1771</span>    then</div>
+<div class="line"><a id="l01772" name="l01772"></a><span class="lineno"> 1772</span>        <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$dns_uuid&quot;</span> <span class="stringliteral">&quot;virtual-DNS&quot;</span></div>
+<div class="line"><a id="l01773" name="l01773"></a><span class="lineno"> 1773</span>    fi</div>
+<div class="line"><a id="l01774" name="l01774"></a><span class="lineno"> 1774</span>}</div>
+<div class="line"><a id="l01775" name="l01775"></a><span class="lineno"> 1775</span> </div>
+<div class="line"><a id="l01776" name="l01776"></a><span class="lineno"> 1776</span>function delete_ipam() {</div>
+<div class="line"><a id="l01777" name="l01777"></a><span class="lineno"> 1777</span>    local ipam_name=<span class="stringliteral">&quot;$1&quot;</span></div>
+<div class="line"><a id="l01778" name="l01778"></a><span class="lineno"> 1778</span>    local ipam_fqname=`<a class="code hl_function" href="basic__rest__functions_8sh.html#aa0373715af0257cdfc05aa9d30d6439e">name_to_fqname</a> <span class="stringliteral">&quot;$ipam_name&quot;</span>`</div>
+<div class="line"><a id="l01779" name="l01779"></a><span class="lineno"> 1779</span>    local ipam_uuid=`<a class="code hl_function" href="basic__rest__functions_8sh.html#ae9019121b0c620264db3a45ca6fa9708">fqname_to_uuid</a> <span class="stringliteral">&quot;$ipam_fqname&quot;</span> <span class="stringliteral">&quot;network-ipam&quot;</span>`</div>
+<div class="line"><a id="l01780" name="l01780"></a><span class="lineno"> 1780</span> </div>
+<div class="line"><a id="l01781" name="l01781"></a><span class="lineno"> 1781</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$ipam_uuid&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ]</div>
+<div class="line"><a id="l01782" name="l01782"></a><span class="lineno"> 1782</span>    then</div>
+<div class="line"><a id="l01783" name="l01783"></a><span class="lineno"> 1783</span>        <a class="code hl_function" href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a> <span class="stringliteral">&quot;$ipam_uuid&quot;</span> <span class="stringliteral">&quot;network-ipam&quot;</span></div>
+<div class="line"><a id="l01784" name="l01784"></a><span class="lineno"> 1784</span>    fi</div>
+<div class="line"><a id="l01785" name="l01785"></a><span class="lineno"> 1785</span>}</div>
+<div class="line"><a id="l01786" name="l01786"></a><span class="lineno"> 1786</span> </div>
+<div class="line"><a id="l01787" name="l01787"></a><span class="lineno"> 1787</span><span class="preprocessor">## @brief A guard variable to prevent recursive execution of basic_rest_functions.sh</span></div>
+<div class="line"><a id="l01788" name="l01788"></a><span class="lineno"><a class="line" href="basic__rest__functions_8sh.html#a8953505cdfb70bf649962db5dd2316ca"> 1788</a></span>export <a class="code hl_variable" href="basic__rest__functions_8sh.html#a8953505cdfb70bf649962db5dd2316ca">BASIC_REST_FUNCTIONS</a>=</div>
+<div class="line"><a id="l01789" name="l01789"></a><span class="lineno"> 1789</span> </div>
+<div class="line"><a id="l01790" name="l01790"></a><span class="lineno"> 1790</span><span class="preprocessor">#</span></div>
+<div class="line"><a id="l01791" name="l01791"></a><span class="lineno"> 1791</span><span class="preprocessor">#END-OF-FILE</span></div>
 <div class="line"><a id="l01792" name="l01792"></a><span class="lineno"> 1792</span><span class="preprocessor">#</span></div>
-<div class="line"><a id="l01793" name="l01793"></a><span class="lineno"> 1793</span><span class="preprocessor">#END-OF-FILE</span></div>
-<div class="line"><a id="l01794" name="l01794"></a><span class="lineno"> 1794</span><span class="preprocessor">#</span></div>
-<div class="line"><a id="l01795" name="l01795"></a><span class="lineno"> 1795</span> </div>
+<div class="line"><a id="l01793" name="l01793"></a><span class="lineno"> 1793</span> </div>
 <div class="ttc" id="abasic__rest__functions_8sh_html_a014bae1783e3d88dba88e29dbb0c5752"><div class="ttname"><a href="basic__rest__functions_8sh.html#a014bae1783e3d88dba88e29dbb0c5752">execute_get_request</a></div><div class="ttdeci">execute_get_request()</div><div class="ttdoc">Executes GET REST request.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00133">basic_rest_functions.sh:133</a></div></div>
 <div class="ttc" id="abasic__rest__functions_8sh_html_a0e126542e5b9010e1ecdfa515edbe71f"><div class="ttname"><a href="basic__rest__functions_8sh.html#a0e126542e5b9010e1ecdfa515edbe71f">make_ipam_subnet_str</a></div><div class="ttdeci">make_ipam_subnet_str()</div><div class="ttdoc">Creates a JSON representation for subnet object.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00260">basic_rest_functions.sh:260</a></div></div>
 <div class="ttc" id="abasic__rest__functions_8sh_html_a1175aec6a7677b48b10f4da51be82c00"><div class="ttname"><a href="basic__rest__functions_8sh.html#a1175aec6a7677b48b10f4da51be82c00">create_bgpaas</a></div><div class="ttdeci">create_bgpaas()</div><div class="ttdoc">Create BPG-as-a-Service.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00841">basic_rest_functions.sh:841</a></div></div>
@@ -1890,7 +1888,7 @@ $(function() {
 <div class="ttc" id="abasic__rest__functions_8sh_html_a7e9c0ad850e751ee6ff20379a10bee23"><div class="ttname"><a href="basic__rest__functions_8sh.html#a7e9c0ad850e751ee6ff20379a10bee23">create_vm_interface_ifnp</a></div><div class="ttdeci">create_vm_interface_ifnp()</div><div class="ttdoc">Create vm interface if it is not present.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00827">basic_rest_functions.sh:827</a></div></div>
 <div class="ttc" id="abasic__rest__functions_8sh_html_a811e572d30402bef8caf489dd9f022e2"><div class="ttname"><a href="basic__rest__functions_8sh.html#a811e572d30402bef8caf489dd9f022e2">delete_entity</a></div><div class="ttdeci">delete_entity()</div><div class="ttdoc">Deletes an entity (object) INPUT: an uuid of an entity and type of an entity.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00463">basic_rest_functions.sh:463</a></div></div>
 <div class="ttc" id="abasic__rest__functions_8sh_html_a8780e775c173c2e161f0346b0b57623e"><div class="ttname"><a href="basic__rest__functions_8sh.html#a8780e775c173c2e161f0346b0b57623e">execute_rest_request</a></div><div class="ttdeci">execute_rest_request()</div><div class="ttdoc">Executes REST request.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00096">basic_rest_functions.sh:96</a></div></div>
-<div class="ttc" id="abasic__rest__functions_8sh_html_a8953505cdfb70bf649962db5dd2316ca"><div class="ttname"><a href="basic__rest__functions_8sh.html#a8953505cdfb70bf649962db5dd2316ca">BASIC_REST_FUNCTIONS</a></div><div class="ttdeci">Exported String BASIC_REST_FUNCTIONS</div><div class="ttdoc">A guard variable to prevent recursive execution of basic_rest_functions.sh.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l01790">basic_rest_functions.sh:1790</a></div></div>
+<div class="ttc" id="abasic__rest__functions_8sh_html_a8953505cdfb70bf649962db5dd2316ca"><div class="ttname"><a href="basic__rest__functions_8sh.html#a8953505cdfb70bf649962db5dd2316ca">BASIC_REST_FUNCTIONS</a></div><div class="ttdeci">Exported String BASIC_REST_FUNCTIONS</div><div class="ttdoc">A guard variable to prevent recursive execution of basic_rest_functions.sh.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l01788">basic_rest_functions.sh:1788</a></div></div>
 <div class="ttc" id="abasic__rest__functions_8sh_html_a8eb9be107fb53369eb80970f30a3f462"><div class="ttname"><a href="basic__rest__functions_8sh.html#a8eb9be107fb53369eb80970f30a3f462">random_hex_digit</a></div><div class="ttdeci">random_hex_digit()</div><div class="ttdoc">Returns a random hex digit.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00039">basic_rest_functions.sh:39</a></div></div>
 <div class="ttc" id="abasic__rest__functions_8sh_html_a9cc7e5df323ff6373c56e89fa91f9ad2"><div class="ttname"><a href="basic__rest__functions_8sh.html#a9cc7e5df323ff6373c56e89fa91f9ad2">create_instance_ip</a></div><div class="ttdeci">create_instance_ip()</div><div class="ttdoc">Creates an IP Instance Input: name, virtual-network fqname, subnet_uuid, ip address(optionally)</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00656">basic_rest_functions.sh:656</a></div></div>
 <div class="ttc" id="abasic__rest__functions_8sh_html_a9ede953a9867c5217d9b5cc98d902cfc"><div class="ttname"><a href="basic__rest__functions_8sh.html#a9ede953a9867c5217d9b5cc98d902cfc">HEX_DIGITS</a></div><div class="ttdeci">String Array HEX_DIGITS</div><div class="ttdoc">Ordered list of digits for hexadecimal numerical system.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00019">basic_rest_functions.sh:19</a></div></div>
