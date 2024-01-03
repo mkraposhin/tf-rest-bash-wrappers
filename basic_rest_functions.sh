@@ -1521,7 +1521,6 @@ REQ_MARKER
     local REQ_URL="$REST_ADDRESS/global-vrouter-config/$gvr_uuid"
     REQ_STR=`echo $REQ_STR`
     echo >> $MESG_LOG
-    echo $REQ_STR
     execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
@@ -1602,7 +1601,6 @@ REQ_MARKER
     local REQ_URL="$REST_ADDRESS/global-vrouter-config/$gvr_uuid"
     REQ_STR=`echo $REQ_STR`
     echo >> $MESG_LOG
-    echo $REQ_STR
     execute_put_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 

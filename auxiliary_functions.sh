@@ -101,18 +101,24 @@ curl_function(){
     local curl_id=$5
     local vm_user=$6
     local vm_ip=$7
+    local ref_str="$8"
+    if [ "$ref_str" = "" ]
+    then
+        ref_str="latest"
+    fi
     if [ "$IDENT_FILE" = "" ]
     then
         echo "Identity file was not specified"
         return 1
     fi
     local conn_timeout=`expr ${#vms_list[@]} \* $conn_time`
+
     local curl_out=`ssh -i $IDENT_FILE \
-        $vm_user@$vm_ip "curl -6 --connect-timeout $conn_timeout \
+        $vm_user@$vm_ip "curl --connect-timeout $conn_timeout \
         http://[$where_addr%$from_intf]:$ip_port"`
 
     # local interm=`echo $curl_out | grep "latest" -o`
-    local n_success_res=`echo $curl_out | grep "latest" \
+    local n_success_res=`echo $curl_out | grep "$ref_str" \
         -o | wc -l`
 
     if [ ! -d $RES_FOLDER ]
@@ -181,8 +187,21 @@ function wait_and_analyze_results() {
     local n_successful=0
     local is_ok=""
 
+    if [ "$n_results_exp" = "" ]
+    then
+        echo "Number of expected results was not specified."
+        return 1
+    fi
+
+    if [ $n_results_exp -lt 1 ]
+    then
+        echo "Wrong Number of expected results was specified: $n_results_exp"
+        return 1
+    fi
+
     if [ ! -d $RES_FOLDER ]
     then
+        echo "$RES_FOLDER result folder doesnt exist"
         return 0
     fi
 
@@ -308,6 +327,19 @@ function check_state_result() {
     grep -q "$reference" <<< "$result"
     local check_res=$?
     return $check_res
+}
+
+function wait_for_condition() {
+    local sleep_time="$2"
+    if [ "$sleep_time" = "" ]
+    then
+        sleep_time=0.1 #100ms
+    fi
+    local cond_res=`$1` #execute condition 1
+    while [ $? -ne 0 ]
+    do
+        cond_res=`$1`
+    done
 }
 
 function results_are_ok() {
