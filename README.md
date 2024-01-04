@@ -8,6 +8,17 @@ virtual networks and other entities. The REST API used in TF is very diverse
 and requires a lot of input. Therefore, the more concise tool to manipulate
 a TF configuation is needed.
 
+## Prerequisites
+
+Next CLI tools should be installed on the system:
+
+1. jq
+2. openstack CLI client
+3. curl cmd
+4. ping cmd
+5. dig cmd
+
+
 ## Examples of usage
 
 ### Creation and deleteion of a virtual network
