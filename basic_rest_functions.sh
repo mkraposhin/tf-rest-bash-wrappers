@@ -267,6 +267,75 @@ function make_ipam_subnet_str(){
     echo "$iss"
 }
 
+## @fn make_random_ipv4_address()
+## @brief Creates random IPv4 address
+function make_random_ipv4_address(){
+    local subnet_prefix=
+    local c_digit=
+    local o_digit=
+
+    # octet 1
+    c_digit=`random_dec_digit_max 3`
+    if [ "$c_digit" != "0" ]
+    then
+        subnet_prefix=$subnet_prefix"$c_digit"
+    fi
+    o_digit=$c_digit
+    c_digit=`random_dec_digit_max 3`
+    if [ "$c_digit" != "0" ] || [ "$o_digit" != "0" ]
+    then
+        subnet_prefix=$subnet_prefix"$c_digit"
+    fi
+    subnet_prefix=$subnet_prefix"`random_dec_digit_max 6`"
+    subnet_prefix=$subnet_prefix"."
+
+    # octet 2
+    c_digit=`random_dec_digit_max 3`
+    if [ "$c_digit" != "0" ]
+    then
+        subnet_prefix=$subnet_prefix"$c_digit"
+    fi
+    o_digit=$c_digit
+    c_digit=`random_dec_digit_max 3`
+    if [ "$c_digit" != "0" ] || [ "$o_digit" != "0" ]
+    then
+        subnet_prefix=$subnet_prefix"$c_digit"
+    fi
+    subnet_prefix=$subnet_prefix"`random_dec_digit_max 6`"
+    subnet_prefix=$subnet_prefix"."
+
+    # octet 3
+    c_digit=`random_dec_digit_max 3`
+    if [ "$c_digit" != "0" ]
+    then
+        subnet_prefix=$subnet_prefix"$c_digit"
+    fi
+    o_digit=$c_digit
+    c_digit=`random_dec_digit_max 3`
+    if [ "$c_digit" != "0" ] || [ "$o_digit" != "0" ]
+    then
+        subnet_prefix=$subnet_prefix"$c_digit"
+    fi
+    subnet_prefix=$subnet_prefix"`random_dec_digit_max 6`"
+    subnet_prefix=$subnet_prefix"."
+
+    # octet 4
+    c_digit=`random_dec_digit_max 3`
+    if [ "$c_digit" != "0" ]
+    then
+        subnet_prefix=$subnet_prefix"$c_digit"
+    fi
+    o_digit=$c_digit
+    c_digit=`random_dec_digit_max 3`
+    if [ "$c_digit" != "0" ] || [ "$o_digit" != "0" ]
+    then
+        subnet_prefix=$subnet_prefix"$c_digit"
+    fi
+    subnet_prefix=$subnet_prefix"`random_dec_digit_max 6`"
+
+    echo "$subnet_prefix"
+}
+
 ## @fn make_random_ipam_subnet_prefix_ipv4()
 ## @brief Creates random IPv4 subnet prefix of a given length
 function make_random_ipam_subnet_prefix_ipv4(){
@@ -962,6 +1031,42 @@ REQ_MARKER
     execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
 }
 
+# @fn create_vdns_record()
+# @brief creates a new virtual DNS record.
+function create_vdns_record() {
+    local record_name="$1"
+    local vdns_name="$2"
+    local vdns_record="$3"
+    local vdns_fqname="[\"default-domain\",\"$vdns_name\"]"
+    local vdns_uuid=`fqname_to_uuid "$vdns_fqname" "virtual-DNS"`
+    if [ "$vdns_uuid" = "" ]
+    then
+        echo "vDNS $vdns_name was not found" >> $MESG_LOG
+        return 1
+    fi
+    local record_fqname=[\"default-domain\",\"$vdns_name\",\"$record_name\"]
+
+    local REQ_STR=
+    read -r -d '' REQ_STR <<- REQ_MARKER
+    {
+            "virtual-DNS-record": {
+            "parent_type": "virtual-DNS",
+            "parent_uuid": "$vdns_uuid",
+            "fq_name": $record_fqname,
+            "virtual_DNS_record_data": {
+                $vdns_record
+            }
+        }
+    }
+REQ_MARKER
+
+    echo $REQ_STR
+    local REQ_URL="$REST_ADDRESS/virtual-DNS-records"
+    REQ_STR=`echo $REQ_STR`
+    echo >> $MESG_LOG
+    execute_post_request "$REQ_STR" "$REQ_URL" >> $MESG_LOG
+}
+
 # @fn create_ipam()
 # @brief Creates a new IPAM with a given DNS server
 function create_ipam(){
@@ -1155,7 +1260,7 @@ REQ_MARKER
 # Add allowed pair
 function link_vmi_with_aap(){
     local vmi_name=$1
-    local new_ip=$2
+    local new_prefix=$2
     local pref_len=$3
     local address_mode=$4
 
@@ -1173,13 +1278,26 @@ function link_vmi_with_aap(){
         return 1
     fi
 
+    grep -q "-" <<< "$new_prefix"
+    local has_mac=$?
+    local mac_cfg_str=
+    if [ $has_mac ]
+    then
+        local mac_len=${new_prefix#*"-"}
+        local dash_pos=$(( ${#new_prefix} - ${#mac_len} - 1 ))
+        local mac="${new_prefix:0:$dash_pos}"
+        local ip_prefix_start=$(( $dash_pos + 1 ))
+        new_prefix="${new_prefix:$ip_prefix_start}"
+        mac_cfg_str=\"mac\":\"$mac\",
+    fi
+
     read -r -d '' REQ_STR <<- REQ_MARKER
     {
         "virtual-machine-interface": {
             "virtual_machine_interface_allowed_address_pairs" : {
                 "allowed_address_pair" : [
-                    {"address_mode" : "$address_mode",
-                     "ip" : {"ip_prefix" : "$new_ip", "ip_prefix_len" : "$pref_len"}}
+                    {"address_mode" : "$address_mode", $mac_cfg_str
+                     "ip" : {"ip_prefix" : "$new_prefix", "ip_prefix_len" : "$pref_len"}}
                 ]
             }
         }
@@ -1763,13 +1881,27 @@ function delete_intf_route_table() {
 }
 
 function delete_virtual_dns() {
-    local dns_name="$1"
-    local dns_fqname="[\"default-domain\",\"$dns_name\"]"
-    local dns_uuid=`fqname_to_uuid "$dns_fqname" "virtual-DNS"`
+    local vdns_name="$1"
+    local vdns_fqname="[\"default-domain\",\"$vdns_name\"]"
+    local vdns_uuid=`fqname_to_uuid "$vdns_fqname" "virtual-DNS"`
 
-    if [ "$dns_uuid" != "" ]
+    if [ "$vdns_uuid" != "" ]
     then
-        delete_entity "$dns_uuid" "virtual-DNS"
+        delete_entity "$vdns_uuid" "virtual-DNS"
+    fi
+}
+
+# @fn delete_vdns_record
+# @brief deletes the specified virtual-DNS-record associated with the
+# specified virtual-DNS
+function delete_vdns_record() {
+    local record_name="$1"
+    local vdns_name="$2"
+    local record_fqname=[\"default-domain\",\"$vdns_name\",\"$record_name\"]
+    local record_uuid=`fqname_to_uuid "$record_fqname" "virtual-DNS-record"`
+    if [ "$record_uuid" != "" ]
+    then
+        delete_entity "$record_uuid" "virtual-DNS-record"
     fi
 }
 
