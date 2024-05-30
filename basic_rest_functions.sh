@@ -15,11 +15,17 @@ fi
 # Constants and a configuration
 #
 
+## @brief Max value of $RANDOM function
+declare RANDOM_MAX=32768
+
 ## @brief Ordered list of digits for hexadecimal numerical system
 declare -a HEX_DIGITS=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9" "A" "B" "C" "D" "E" "F")
 
 ## @brief Ordered list of capital latin letters
 declare -a LAT_LETTERS=(A B C D E F G H I J K L M N O P Q R S T U V U W X Y Z)
+
+## @brief Powers of 2
+declare -a POWERS_OF_2=("1" "2" "4" "8" "16" "32" "64" "128" "256")
 
 ## @brief Contains name of log file
 declare MESG_LOG=log
@@ -334,6 +340,65 @@ function make_random_ipv4_address(){
     subnet_prefix=$subnet_prefix"`random_dec_digit_max 6`"
 
     echo "$subnet_prefix"
+}
+
+## @fn make_random_ipv4_subnet_octet
+## @brief Creates a random octet for subnet with the given length (maximum
+## number of the most significant bits)
+function make_random_ipv4_subnet_octet() {
+    local k=$1
+    if [ $k -lt 1 ] || [ $k -gt 8 ]
+    then
+        echo "0"
+        return 1
+    fi
+    local c=${POWERS_OF_2[$k]}
+    local r=`expr $RANDOM \* $c / $RANDOM_MAX`
+    local delta=`expr 256 / $c`
+    local addr=`expr $delta \* $r`
+    echo $addr
+    return 0
+}
+
+## @fn
+## @brief
+function make_random_ipv4_subnet() {
+    local prefix_len=$1
+    if [ $prefix_len -le 0 ] || [ $prefix_len -ge 32 ]
+    then
+        echo "0.0.0.0"
+        return 1
+    fi
+    local n_octets=4
+    local i_octet=0
+    local bits_left=$prefix_len
+    local bits_in_octet=
+    local subnet_str=
+    local octet_str=
+    while [ $i_octet -lt $n_octets ]
+    do
+        bits_in_octet=$bits_left
+        if [ $bits_in_octet -lt 0 ]
+        then
+            subnet_str=$subnet_str".0"
+        else
+            if [ $bits_in_octet -ge 8 ]
+            then
+                octet_str=`make_random_ipv4_subnet_octet 8`
+            else
+                octet_str=`make_random_ipv4_subnet_octet $bits_in_octet`
+            fi
+            if [ $i_octet -eq 0 ]
+            then
+                subnet_str=$octet_str
+            else
+                subnet_str=$subnet_str"."$octet_str
+            fi
+        fi
+        bits_left=`expr $bits_left - 8`
+        i_octet=`expr $i_octet + 1`
+    done
+    echo $subnet_str
 }
 
 ## @fn make_random_ipam_subnet_prefix_ipv4()

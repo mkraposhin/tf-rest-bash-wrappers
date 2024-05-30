@@ -93,7 +93,7 @@ function ping_function(){
 ## @fn curl_function()
 ## @brief runs curl for the given IPv6 address from
 ## the given virtual machine
-curl_function(){
+function curl_function(){
     local where_addr=$1
     local ip_port=$2
     local from_intf=$3
@@ -329,19 +329,45 @@ function check_state_result() {
     return $check_res
 }
 
+## @fn wait_for_condition
+## @brief the function waits for a successful execution of a function or a
+## command. The function or a command should return 0 in case of success and
+## 1 in case of failure.
 function wait_for_condition() {
     local sleep_time="$2"
     if [ "$sleep_time" = "" ]
     then
         sleep_time=0.1 #100ms
     fi
-    local cond_res=`$1` #execute condition 1
-    while [ $? -ne 0 ]
+    $1 #execute the provided command
+    local cond_res=$?
+    while [ $cond_res -ne 0 ]
     do
-        cond_res=`$1`
+        sleep $sleep_time
+        $1 #execute the provided command
+        cond_res=$?
     done
 }
 
+## @fn is_process_nonexistent
+## @brief the function determines whether the process is not running. Returns
+## 0 if there are no processes with the specified name and 1 otherwise.
+function is_process_nonexistent() {
+    local proc_name=$1
+    n_processes=`pgrep $proc_name | wc -l`
+    if [ $n_processes -ne 0 ]
+    then
+        #echo "There are $n_processes copies of $proc_name have been left in the memory" 1>&2
+        return 1
+    fi
+    #echo "No processes $proc_name have been left in the memory" 1>&2
+    return 0
+}
+
+## @fn results_are_ok
+## @brief the function checks whether all the specified results (return codes)
+## contain correct values. Returns 0 if there are no non-zero return codes and
+## 1 otherwise.
 function results_are_ok() {
     local all_ok=0
     for res in "$@"
