@@ -168,7 +168,7 @@ $(function() {
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span><span class="preprocessor">## @fn curl_function()</span></div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="preprocessor">## @brief runs curl for the given IPv6 address from</span></div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span><span class="preprocessor">## the given virtual machine</span></div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>curl_function(){</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>function curl_function(){</div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    local where_addr=$1</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    local ip_port=$2</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    local from_intf=$3</div>
@@ -404,45 +404,71 @@ $(function() {
 <div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>    <span class="keywordflow">return</span> $check_res</div>
 <div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>}</div>
 <div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span> </div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>function wait_for_condition() {</div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>    local sleep_time=<span class="stringliteral">&quot;$2&quot;</span></div>
-<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$sleep_time&quot;</span> = <span class="stringliteral">&quot;&quot;</span> ]</div>
-<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>    then</div>
-<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>        sleep_time=0.1 #100ms</div>
-<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>    fi</div>
-<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>    local cond_res=`$1` #execute condition 1</div>
-<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>    <span class="keywordflow">while</span> [ $? -ne 0 ]</div>
-<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>    <span class="keywordflow">do</span></div>
-<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>        cond_res=`$1`</div>
-<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    done</div>
-<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>}</div>
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span> </div>
-<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>function results_are_ok() {</div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>    local all_ok=0</div>
-<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>    <span class="keywordflow">for</span> res in <span class="stringliteral">&quot;$@&quot;</span></div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>    <span class="keywordflow">do</span></div>
-<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>        <span class="keywordflow">if</span> [ $res -ne 0 ]</div>
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>        then</div>
-<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>            all_ok=1</div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>            <span class="keywordflow">break</span></div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>        fi</div>
-<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>    done</div>
-<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>    <span class="keywordflow">if</span> [ $all_ok -ne 0 ]</div>
-<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>    then</div>
-<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>        echo <span class="stringliteral">&quot;FAILED: $@&quot;</span></div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>        <span class="keywordflow">return</span> 1</div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    fi</div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    <span class="keywordflow">return</span> 0</div>
-<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>}</div>
-<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span> </div>
-<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>export AUXILIARY_FUNCTIONS=</div>
-<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span> </div>
-<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span><span class="preprocessor">#</span></div>
-<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span><span class="preprocessor">#END-OF-FILE</span></div>
-<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span><span class="preprocessor">#</span></div>
-<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span> </div>
-<div class="ttc" id="abasic__rest__functions_8sh_html_a348deaecb25742bc12a18cfb6cda00e3"><div class="ttname"><a href="basic__rest__functions_8sh.html#a348deaecb25742bc12a18cfb6cda00e3">is_ipv6_address</a></div><div class="ttdeci">is_ipv6_address()</div><div class="ttdoc">Determines whether a given address belongs to IPv6 range.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00163">basic_rest_functions.sh:163</a></div></div>
-<div class="ttc" id="abasic__rest__functions_8sh_html_ad63da976482d8e2c28236a9c2e7173a0"><div class="ttname"><a href="basic__rest__functions_8sh.html#ad63da976482d8e2c28236a9c2e7173a0">is_ipv4_address</a></div><div class="ttdeci">is_ipv4_address()</div><div class="ttdoc">Determines whether a given address belongs to IPv4 range.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00176">basic_rest_functions.sh:176</a></div></div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span><span class="preprocessor">## @fn wait_for_condition</span></div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span><span class="preprocessor">## @brief the function waits for a successful execution of a function or a</span></div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span><span class="preprocessor">## command. The function or a command should return 0 in case of success and</span></div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span><span class="preprocessor">## 1 in case of failure.</span></div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>function wait_for_condition() {</div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>    local sleep_time=<span class="stringliteral">&quot;$2&quot;</span></div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>    <span class="keywordflow">if</span> [ <span class="stringliteral">&quot;$sleep_time&quot;</span> = <span class="stringliteral">&quot;&quot;</span> ]</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>    then</div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>        sleep_time=0.1 #100ms</div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>    fi</div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>    $1 #execute the provided command</div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>    local cond_res=$?</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>    <span class="keywordflow">while</span> [ $cond_res -ne 0 ]</div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>    <span class="keywordflow">do</span></div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>        sleep $sleep_time</div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>        $1 #execute the provided command</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>        cond_res=$?</div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>    done</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>}</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span> </div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span><span class="preprocessor">## @fn is_process_nonexistent</span></div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span><span class="preprocessor">## @brief the function determines whether the process is not running. Returns</span></div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span><span class="preprocessor">## 0 if there are no processes with the specified name and 1 otherwise.</span></div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>function is_process_nonexistent() {</div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>    local proc_name=$1</div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    n_processes=`pgrep $proc_name | wc -l`</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    <span class="keywordflow">if</span> [ $n_processes -ne 0 ]</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    then</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span><span class="preprocessor">        #echo &quot;There are $n_processes copies of $proc_name have been left in the memory&quot;</span> 1&gt;&amp;2</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>        <span class="keywordflow">return</span> 1</div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    fi</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span><span class="preprocessor">    #echo &quot;No processes $proc_name have been left in the memory&quot;</span> 1&gt;&amp;2</div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>    <span class="keywordflow">return</span> 0</div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>}</div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span> </div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span><span class="preprocessor">## @fn results_are_ok</span></div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span><span class="preprocessor">## @brief the function checks whether all the specified results (return codes)</span></div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span><span class="preprocessor">## contain correct values. Returns 0 if there are no non-zero return codes and</span></div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span><span class="preprocessor">## 1 otherwise.</span></div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>function results_are_ok() {</div>
+<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>    local all_ok=0</div>
+<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span>    <span class="keywordflow">for</span> res in <span class="stringliteral">&quot;$@&quot;</span></div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>    <span class="keywordflow">do</span></div>
+<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>        <span class="keywordflow">if</span> [ $res -ne 0 ]</div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>        then</div>
+<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span>            all_ok=1</div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>            <span class="keywordflow">break</span></div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>        fi</div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>    done</div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>    <span class="keywordflow">if</span> [ $all_ok -ne 0 ]</div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>    then</div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>        echo <span class="stringliteral">&quot;FAILED: $@&quot;</span></div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>        <span class="keywordflow">return</span> 1</div>
+<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>    fi</div>
+<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span>    <span class="keywordflow">return</span> 0</div>
+<div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span>}</div>
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span> </div>
+<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>export AUXILIARY_FUNCTIONS=</div>
+<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span> </div>
+<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span><span class="preprocessor">#</span></div>
+<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span><span class="preprocessor">#END-OF-FILE</span></div>
+<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span><span class="preprocessor">#</span></div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span> </div>
+<div class="ttc" id="abasic__rest__functions_8sh_html_a348deaecb25742bc12a18cfb6cda00e3"><div class="ttname"><a href="basic__rest__functions_8sh.html#a348deaecb25742bc12a18cfb6cda00e3">is_ipv6_address</a></div><div class="ttdeci">is_ipv6_address()</div><div class="ttdoc">Determines whether a given address belongs to IPv6 range.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00169">basic_rest_functions.sh:169</a></div></div>
+<div class="ttc" id="abasic__rest__functions_8sh_html_ad63da976482d8e2c28236a9c2e7173a0"><div class="ttname"><a href="basic__rest__functions_8sh.html#ad63da976482d8e2c28236a9c2e7173a0">is_ipv4_address</a></div><div class="ttdeci">is_ipv4_address()</div><div class="ttdoc">Determines whether a given address belongs to IPv4 range.</div><div class="ttdef"><b>Definition:</b> <a href="basic__rest__functions_8sh_source.html#l00182">basic_rest_functions.sh:182</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -1,14 +1,9 @@
 var searchData=
 [
-  ['make_5fip_5finstance_5fname_0',['make_ip_instance_name',['../basic__rest__functions_8sh.html#affb5100cc2a2bea66eafce16674e34d7',1,'basic_rest_functions.sh']]],
-  ['make_5fipam_5fsubnet_1',['make_ipam_subnet',['../basic__rest__functions_8sh.html#aadaf6bc545679279b80cc696525c431e',1,'basic_rest_functions.sh']]],
-  ['make_5fipam_5fsubnet_5fstr_2',['make_ipam_subnet_str',['../basic__rest__functions_8sh.html#a0e126542e5b9010e1ecdfa515edbe71f',1,'basic_rest_functions.sh']]],
-  ['make_5frandom_5fipam_5fsubnet_5fipv4_3',['make_random_ipam_subnet_ipv4',['../basic__rest__functions_8sh.html#ada3d8ca9d04fe3bd63f0cbe03370cbe5',1,'basic_rest_functions.sh']]],
-  ['make_5frandom_5fipam_5fsubnet_5fipv6_4',['make_random_ipam_subnet_ipv6',['../basic__rest__functions_8sh.html#a788c815f77f53750e8fdb0e9494345c0',1,'basic_rest_functions.sh']]],
-  ['make_5frandom_5fipam_5fsubnet_5fprefix_5fipv4_5',['make_random_ipam_subnet_prefix_ipv4',['../basic__rest__functions_8sh.html#a3f83b6a6b32a8c923dee482720272938',1,'basic_rest_functions.sh']]],
-  ['make_5frandom_5fipam_5fsubnet_5fprefix_5fipv6_6',['make_random_ipam_subnet_prefix_ipv6',['../basic__rest__functions_8sh.html#a3f42dbb49c8cd17c7c48d810b645e3f0',1,'basic_rest_functions.sh']]],
-  ['make_5frandom_5fipam_5fsubnets_5fipv4_7',['make_random_ipam_subnets_ipv4',['../basic__rest__functions_8sh.html#abc8118275c8ab34887b47bc29b62efbd',1,'basic_rest_functions.sh']]],
-  ['make_5frandom_5fipam_5fsubnets_5fipv6_8',['make_random_ipam_subnets_ipv6',['../basic__rest__functions_8sh.html#a338fa05ed99eadb78589447188814413',1,'basic_rest_functions.sh']]],
-  ['make_5frandom_5fipv4_5faddress_9',['make_random_ipv4_address',['../basic__rest__functions_8sh.html#ab8a5b606f942ffd91ccb9f3cbf861b0b',1,'basic_rest_functions.sh']]],
-  ['mesg_5flog_10',['MESG_LOG',['../basic__rest__functions_8sh.html#adaf61c63e10eb58288850fb3d98237c7',1,'basic_rest_functions.sh']]]
+  ['random_5fdec_5fdigit_0',['random_dec_digit',['../basic__rest__functions_8sh.html#aa9e41eca7d669a277c087b2c888c68d9',1,'basic_rest_functions.sh']]],
+  ['random_5fdec_5fdigit_5fmax_1',['random_dec_digit_max',['../basic__rest__functions_8sh.html#a251b4f69056d28588d7527d91b0b6520',1,'basic_rest_functions.sh']]],
+  ['random_5fhex_5fdigit_2',['random_hex_digit',['../basic__rest__functions_8sh.html#a8eb9be107fb53369eb80970f30a3f462',1,'basic_rest_functions.sh']]],
+  ['random_5fletter_3',['random_letter',['../basic__rest__functions_8sh.html#aa58d453c222e32c1b03eb591fd342eda',1,'basic_rest_functions.sh']]],
+  ['random_5fmax_4',['RANDOM_MAX',['../basic__rest__functions_8sh.html#a1c66275e4202f5ace626f3616cdeecd2',1,'basic_rest_functions.sh']]],
+  ['random_5fstring_5',['random_string',['../basic__rest__functions_8sh.html#ad0b4eec54a0b6b6ef8d9d854335a7520',1,'basic_rest_functions.sh']]]
 ];
