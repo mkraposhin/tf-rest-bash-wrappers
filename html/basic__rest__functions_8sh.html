@@ -138,6 +138,15 @@ Functions</h2></td></tr>
 <tr class="memitem:a0e126542e5b9010e1ecdfa515edbe71f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#a0e126542e5b9010e1ecdfa515edbe71f">make_ipam_subnet_str</a> ()</td></tr>
 <tr class="memdesc:a0e126542e5b9010e1ecdfa515edbe71f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a JSON representation for subnet object.  <a href="basic__rest__functions_8sh.html#a0e126542e5b9010e1ecdfa515edbe71f">More...</a><br /></td></tr>
 <tr class="separator:a0e126542e5b9010e1ecdfa515edbe71f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a1db4d08285cc950eeaddc9fb9c400a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#a0a1db4d08285cc950eeaddc9fb9c400a">ipv4_to_number</a> ()</td></tr>
+<tr class="memdesc:a0a1db4d08285cc950eeaddc9fb9c400a"><td class="mdescLeft">&#160;</td><td class="mdescRight">converts an IPv4 address into the number  <a href="basic__rest__functions_8sh.html#a0a1db4d08285cc950eeaddc9fb9c400a">More...</a><br /></td></tr>
+<tr class="separator:a0a1db4d08285cc950eeaddc9fb9c400a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8869e1c405d223bf3114fe295bb7172e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#a8869e1c405d223bf3114fe295bb7172e">number_to_ipv4</a> ()</td></tr>
+<tr class="memdesc:a8869e1c405d223bf3114fe295bb7172e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a number to IPv4 address.  <a href="basic__rest__functions_8sh.html#a8869e1c405d223bf3114fe295bb7172e">More...</a><br /></td></tr>
+<tr class="separator:a8869e1c405d223bf3114fe295bb7172e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af33ce55dbee3af65ad2a6a57d86722d8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#af33ce55dbee3af65ad2a6a57d86722d8">split_network_by24</a> ()</td></tr>
+<tr class="memdesc:af33ce55dbee3af65ad2a6a57d86722d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">splits the given network by 24 mask subnets  <a href="basic__rest__functions_8sh.html#af33ce55dbee3af65ad2a6a57d86722d8">More...</a><br /></td></tr>
+<tr class="separator:af33ce55dbee3af65ad2a6a57d86722d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8a5b606f942ffd91ccb9f3cbf861b0b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="basic__rest__functions_8sh.html#ab8a5b606f942ffd91ccb9f3cbf861b0b">make_random_ipv4_address</a> ()</td></tr>
 <tr class="memdesc:ab8a5b606f942ffd91ccb9f3cbf861b0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates random IPv4 address.  <a href="basic__rest__functions_8sh.html#ab8a5b606f942ffd91ccb9f3cbf861b0b">More...</a><br /></td></tr>
 <tr class="separator:ab8a5b606f942ffd91ccb9f3cbf861b0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -320,6 +329,28 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a0a1db4d08285cc950eeaddc9fb9c400a" name="a0a1db4d08285cc950eeaddc9fb9c400a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a1db4d08285cc950eeaddc9fb9c400a">&#9670;&#160;</a></span>ipv4_to_number()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ipv4_to_number </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>converts an IPv4 address into the number </p>
+
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00278">278</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  278</span>{</div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="ad63da976482d8e2c28236a9c2e7173a0" name="ad63da976482d8e2c28236a9c2e7173a0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad63da976482d8e2c28236a9c2e7173a0">&#9670;&#160;</a></span>is_ipv4_address()</h2>
 
@@ -403,8 +434,8 @@ Variables</h2></td></tr>
 
 <p>Creates random IPv4 address. </p>
 
-<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00278">278</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  278</span>{</div>
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00381">381</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  381</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -427,6 +458,28 @@ Variables</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00153">153</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  153</span>{</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a8869e1c405d223bf3114fe295bb7172e" name="a8869e1c405d223bf3114fe295bb7172e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8869e1c405d223bf3114fe295bb7172e">&#9670;&#160;</a></span>number_to_ipv4()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">number_to_ipv4 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Converts a number to IPv4 address. </p>
+
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00306">306</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  306</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -581,6 +634,28 @@ Variables</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00234">234</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
 <div class="fragment"><div class="line"><span class="lineno">  234</span>{</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="af33ce55dbee3af65ad2a6a57d86722d8" name="af33ce55dbee3af65ad2a6a57d86722d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af33ce55dbee3af65ad2a6a57d86722d8">&#9670;&#160;</a></span>split_network_by24()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">split_network_by24 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>splits the given network by 24 mask subnets </p>
+
+<p class="definition">Definition at line <a class="el" href="basic__rest__functions_8sh_source.html#l00335">335</a> of file <a class="el" href="basic__rest__functions_8sh_source.html">basic_rest_functions.sh</a>.</p>
+<div class="fragment"><div class="line"><span class="lineno">  335</span>{</div>
 </div><!-- fragment -->
 </div>
 </div>
