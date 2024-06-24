@@ -273,6 +273,109 @@ function make_ipam_subnet_str(){
     echo "$iss"
 }
 
+## @fn ipv4_to_number()
+## @brief converts an IPv4 address into the number
+function ipv4_to_number() {
+    local ipv4_address=$1
+    local octets=
+    local oct=
+    local number=0
+    local n=1
+    local k=3
+    IFS='.'
+    read -ra octets <<< "$ipv4_address"
+
+    if [ ${#octets[@]} -ne 4 ]
+    then
+        echo "0"
+        return 1
+    fi
+
+    while [ $k -ge 0 ]
+    do
+        oct=${octets[$k]}
+        number=`expr $oct \* $n + $number`
+        n=`expr 256 \* $n`
+        k=`expr $k - 1`
+    done
+    echo "$number"
+}
+
+## @fn number_to_ipv4()
+## @brief Converts a number to IPv4 address
+function number_to_ipv4() {
+    local number=$1
+    local ipv4=
+
+    oct1n=1
+    oct2n="$((256))"
+    oct3n="$((256*256))"
+    oct4n="$((256*256*256))"
+
+    oct="$(($number / $oct4n))"
+    ipv4="$oct"
+    number="$(($number - $oct*$oct4n))"
+    
+    oct="$(($number / $oct3n))"
+    ipv4="$ipv4"."$oct"
+    number="$(($number - $oct*$oct3n))"
+
+    oct="$(($number / $oct2n))"
+    ipv4="$ipv4"."$oct"
+    number="$(($number - $oct*$oct2n))"
+
+    oct="$(($number / $oct1n))"
+    ipv4="$ipv4"."$oct"
+
+    echo "$ipv4"
+}
+
+## @fn split_network_by24()
+## @brief splits the given network by 24 mask subnets
+function split_network_by24() {
+    local net_prefix=$1
+
+    local net_prefix_len=${net_prefix#*"/"}
+    local slash_pos=$(( ${#net_prefix} - ${#net_prefix_len} - 1 ))
+    local net_addr="${net_prefix:0:$slash_pos}"
+    local net_power="$((32 - $net_prefix_len))"
+
+    local net_number=`ipv4_to_number $net_addr`
+
+    local subnets=
+    local subnet24_prefix
+
+    if [ $net_prefix_len -ge 24 ]
+    then
+        echo "$net_prefix"
+        return 1
+    fi
+
+    if [ $net_number -eq 0 ]
+    then
+        echo "0.0.0.0/24"
+        return 1
+    fi
+
+    local host_number="$((2**$net_power))"
+    local next_net_number="$(($net_number + $host_number))"
+    local net24_number=$net_number
+    local networks24=
+    local net24_addr=
+    while [ $net24_number -lt $next_net_number ]
+    do
+        net24_addr=`number_to_ipv4 $net24_number`
+        if [ "$networks24" = "" ]
+        then
+            networks24="$net24_addr/24"
+        else
+            networks24="$networks24 $net24_addr/24"
+        fi
+        net24_number="$(($net24_number + 256))"
+    done
+    echo "$networks24"
+}
+
 ## @fn make_random_ipv4_address()
 ## @brief Creates random IPv4 address
 function make_random_ipv4_address(){
