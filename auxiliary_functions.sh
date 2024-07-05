@@ -386,6 +386,130 @@ function results_are_ok() {
     return 0
 }
 
+## @fn aggregate_over_list
+## @brief Aggregates (summates) value of the specified list
+function aggregate_over_list() {
+    local xml_file=$1
+    local list_path=$2
+    local item_name=$3
+    local value_name=$4
+
+    if [ "$xml_file" = "" ]
+    then
+        echo "The XML file was not specified"
+        return 1
+    fi
+
+    if [ "$list_path" = "" ]
+    then
+        echo "The list path was not specified"
+        return 1
+    fi
+
+    if [ "$value_name" = "" ]
+    then
+        echo "The value name was not specified"
+        return 1
+    fi
+
+    local list_size=`xmllint --xpath "string($list_path/@size)" $xml_file`
+    if [ "$list_size" = "" ]
+    then
+        list_size=0
+    fi
+
+    local i_elem=1
+    local aggr_value=0
+    local curr_value=0
+    local value_path=
+    while [ $i_elem -le $list_size ]
+    do
+        value_path="$list_path/$item_name[$i_elem]/$value_name"
+        curr_value=`xmllint --xpath "string($value_path)" $xml_file`
+        aggr_value=$(($curr_value + $aggr_value))
+        i_elem=$(($i_elem + 1))
+    done
+
+    echo $aggr_value
+}
+
+## @fn query_task_stats
+## @brief gather task stats for a given OpenSDN module
+function query_task_stats() {
+    local module_ip=$1
+    local module_port=$2
+
+    if [ "$module_ip" = "" ]
+    then
+        echo "The IP to query was not specified"
+        return 1
+    fi
+
+    if [ "$module_port" = "" ]
+    then
+        echo "The port to query was not specified"
+        return 1
+    fi
+
+    curl -s -o t_task_state.xml http://$module_ip:$module_port/Snh_SandeshTaskSummaryRequest?
+    #local n_tasks=`xmllint --xpath "string(//task_group_list[name='$vrf_name']/ucindex)" t_vrfs.xml`
+
+    local n_tasks=`xmllint --xpath "string(//task_group_list/list/@size)" t_task_state.xml`
+    if [ "$n_tasks" = "" ]
+    then
+        n_tasks=0
+    fi
+
+    local i_task=1 # indices are 1-based
+    local tasks_created=
+    local tasks_completed=
+    local tasks_running=
+    local waitq_size=
+    local deferq_size=
+    echo "i task tasks_created tasks_completed tasks_running waitq_size deferq_size"
+    while [ $i_task -le $n_tasks ]
+    do
+        local task_name=`xmllint --xpath "string(//task_group_list/list/SandeshTaskGroup[$i_task]/name)" t_task_state.xml`
+        tasks_created=`\
+            aggregate_over_list \
+            t_task_state.xml \
+            "//task_group_list/list/SandeshTaskGroup[$i_task]/task_entry_list/list" \
+            "SandeshTaskEntry" \
+            "tasks_created"`
+
+        tasks_completed=`\
+            aggregate_over_list \
+            t_task_state.xml \
+            "//task_group_list/list/SandeshTaskGroup[$i_task]/task_entry_list/list" \
+            "SandeshTaskEntry" \
+            "tasks_completed"`
+
+        tasks_running=`\
+            aggregate_over_list \
+            t_task_state.xml \
+            "//task_group_list/list/SandeshTaskGroup[$i_task]/task_entry_list/list" \
+            "SandeshTaskEntry" \
+            "tasks_running"`
+
+        waitq_size=`\
+            aggregate_over_list \
+            t_task_state.xml \
+            "//task_group_list/list/SandeshTaskGroup[$i_task]/task_entry_list/list" \
+            "SandeshTaskEntry" \
+            "waitq_size"`
+
+        deferq_size=`\
+            aggregate_over_list \
+            t_task_state.xml \
+            "//task_group_list/list/SandeshTaskGroup[$i_task]/task_entry_list/list" \
+            "SandeshTaskEntry" \
+            "deferq_size"`
+
+        echo "$i_task $task_name $tasks_created $tasks_completed $tasks_running $waitq_size $deferq_size"
+        i_task=$(($i_task + 1))
+    done
+}
+
 export AUXILIARY_FUNCTIONS=
 
 #
