@@ -5,6 +5,32 @@ then
     exit 0
 fi
 
+## @fn gobgp_toml_config()
+## @brief returns a minimum GoBGP config (in TOML format) for a BGP server
+function gobgp_toml_config() {
+    local local_asn=$1
+    local remote_asn=$2
+    local local_router_ip=$3
+    local remote_router_ip=$4
+
+    local BGP_CONF=
+
+read -r -d '' BGP_CONF <<- BGP_CONF_MARKER
+[global.config]
+  as = "$local_asn"
+  router-id = "$local_router_ip"
+[[neighbors]]
+  [neighbors.config]
+    neighbor-address = "$remote_router_ip"
+    peer-as = "$remote_asn"
+  [[neighbors.afi-safis]]
+    [neighbors.afi-safis.config]
+      afi-safi-name = "l2vpn-evpn"
+BGP_CONF_MARKER
+
+    echo "$BGP_CONF"
+}
+
 ## @fn frr_bgp_config()
 ## @brief returns minimum FRR config for BGP server
 function frr_bgp_config() {
@@ -17,7 +43,7 @@ function frr_bgp_config() {
         adv_ip="10.0.0.100/32"
     fi
 
-local BGP_CONF=
+    local BGP_CONF=
 
 read -r -d '' BGP_CONF <<- BGP_CONF_MARKER
         log syslog informational
@@ -35,7 +61,23 @@ read -r -d '' BGP_CONF <<- BGP_CONF_MARKER
         !
 BGP_CONF_MARKER
 
+}
 
+## @fn run_gobgpd
+## @brief runs gobgpd daemon on the specified machine
+function run_gobgpd() {
+    local local_asn=$1 # where GoBGP is installed
+    local remote_asn=$2
+    local local_router_ip=$3 # where GoBGP is installed
+    local remote_router_ip=$4
+    gobgp_toml_config $local_asn $remote_asn \
+        $local_router_ip $remote_router_ip > ./gobgpd.toml.conf
+
+    ssh root@$local_router_ip "pkill gobgpd"
+    ssh root@$local_router_ip "mkdir -p /etc/gobgp.d"
+    ssh root@$local_router_ip "rm -rf /etc/gobgp.d/gobgpd.toml.conf"
+    scp ./gobgpd.toml.conf root@$local_router_ip:/etc/gobgp.d/gobgpd.toml.conf
+    ssh root@$local_router_ip  "gobgpd -f /etc/gobgp.d/gobgpd.toml.conf" &
 }
 
 ## @fn clean_results()
@@ -434,7 +476,7 @@ function aggregate_over_list() {
 }
 
 ## @fn query_task_stats
-## @brief gather task stats for a given OpenSDN module
+## @brief Gathers task stats for a given OpenSDN module
 function query_task_stats() {
     local module_ip=$1
     local module_port=$2
@@ -482,7 +524,7 @@ function query_task_stats() {
             t_task_state.xml \
             "//task_group_list/list/SandeshTaskGroup[$i_task]/task_entry_list/list" \
             "SandeshTaskEntry" \
-            "tasks_completed"`
+            "total_tasks_completed"`
 
         tasks_running=`\
             aggregate_over_list \
@@ -515,4 +557,7 @@ export AUXILIARY_FUNCTIONS=
 #
 #END-OF-FILE
 #
+
+
+
 
