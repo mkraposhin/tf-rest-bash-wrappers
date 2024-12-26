@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>TF REST bash wrappers: File List</title>
+<title>TF REST bash wrappers: extract_flow_a_table.sh Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -70,20 +70,23 @@ $(function() {
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">File List</div></div>
+  <div class="headertitle"><div class="title">extract_flow_a_table.sh</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock">Here is a list of all documented files with brief descriptions:</div><div class="directory">
-<table class="directory">
-<tr id="row_0_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><a href="auxiliary__functions_8sh_source.html"><span class="icondoc"></span></a><b>auxiliary_functions.sh</b></td><td class="desc"></td></tr>
-<tr id="row_1_" class="odd"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><a href="basic__rest__functions_8sh_source.html"><span class="icondoc"></span></a><a class="el" href="basic__rest__functions_8sh.html" target="_self">basic_rest_functions.sh</a></td><td class="desc">A set of functions to talk to the TF Config REST server </td></tr>
-<tr id="row_2_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><a href="controller__settings__0_8sh_source.html"><span class="icondoc"></span></a><b>controller_settings_0.sh</b></td><td class="desc"></td></tr>
-<tr id="row_3_" class="odd"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><a href="extract__flow__a__table_8sh_source.html"><span class="icondoc"></span></a><b>extract_flow_a_table.sh</b></td><td class="desc"></td></tr>
-<tr id="row_4_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><a href="extract__flow__k__table_8sh_source.html"><span class="icondoc"></span></a><b>extract_flow_k_table.sh</b></td><td class="desc"></td></tr>
-<tr id="row_5_" class="odd"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><a href="openstack__functions_8sh_source.html"><span class="icondoc"></span></a><b>openstack_functions.sh</b></td><td class="desc"></td></tr>
-</table>
-</div><!-- directory -->
-</div><!-- contents -->
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span>flow_table_dump_part=log.AllFlowsreg</div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span>n_flow_key=any #any value is needed to start the extraction procedure</div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span>stop_flow_key=<span class="stringliteral">&quot;0-0-0-0-0-0.0.0.0-0.0.0.0&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span>i_part=0</div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>curl http:<span class="comment">//127.0.0.1:8085/Snh_FetchAllFlowRecords? &gt; $flow_table_dump_part-$i_part</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>n_flow_key=`xmllint --xpath <span class="stringliteral">&quot;string(//FlowRecordsResp/flow_key)&quot;</span> $flow_table_dump_part-$i_part`</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keywordflow">while</span> [ <span class="stringliteral">&quot;$n_flow_key&quot;</span> != <span class="stringliteral">&quot;&quot;</span> ] &amp;&amp; [ <span class="stringliteral">&quot;$n_flow_key&quot;</span> != <span class="stringliteral">&quot;$stop_flow_key&quot;</span> ]</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keywordflow">do</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    i_part=`expr $i_part + 1`</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    curl http:<span class="comment">//127.0.0.1:8085/Snh_NextFlowRecordsSet?flow_key=$n_flow_key &gt; $flow_table_dump_part-$i_part</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    n_flow_key=`xmllint --xpath <span class="stringliteral">&quot;string(//FlowRecordsResp/flow_key)&quot;</span> $flow_table_dump_part-$i_part`</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>done</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>echo $n_flow_key</div>
+</div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.5
